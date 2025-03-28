@@ -1,83 +1,105 @@
 import numpy as np
 
 ######TO DO######
+# add def to build input matrix or just an array
+# understand what the dot product is doing
+# add a main and test SNN
+# add multiple connections/def for establishing connection matrix?
 # add visualisation
 # add specifications of variable type in defs
-# add multiple connections
-# decide for a LIF formula
-# add a main and test SNN
+# play with parameters 
+
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
 # in LIF: threshold: -55, reset_voltage: -75, then formula with -
 
-import numpy as np
+
 
 class SNN:
-    def __init__(self, delta_time=1.0, threshold=-55, resting_potential=-65, tau=10.0,
-                 neurons=10, input_matrix=None, connectivity_matrix=None):
+    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
+                 num_neurons=10, input_matrix=None):
         '''
         1) SNN that conductions spikes in an interconnected network of LIF neurons
 
-        input parameters:
+        parameters:
             delta_time: time step for the simulation
             threshold: voltage threshold for when to spike
             resting_potential: membrane potential at rest/same as reset voltage
             tau: membrane time constant 
-            neurons: number of connected neurons in the network
+            num_neurons: number of connected neurons in the network
             input_matrix: good question??? weight matrix for how to forward external input, for me probably just 1 for each neuron that should be a staring neuron, 0 for all others
             connectivity_matrix: weight matrix of inter-connecting neurons, 0 for no connection
-
         '''
+
         self.delta_time = delta_time
         self.resting_potential = resting_potential
-        self.tau = tau
         self.threshold = threshold
-    
-        self.neurons = neurons
-        self.input_matrix = input_matrix
-        self.connectivity_matrix = connectivity_matrix
+        self.tau = tau
+        self.neurons = num_neurons
+        
+        
+        self.input_matrix = input_matrix(num_inputs)
+        self.connectivity_matrix = np.zeros((num_neurons, num_neurons)) 
 
         #self.t_refr = t_refr
-        #self.n_inputs = n_inputs
 
 
-            
-    def lif_integration(self, membrane_potentials, input_currents):
+
+    def connect(self, from_neuron, to_neuron, weight):
+        '''
+        1) adds lateral connections to the network i.e. substitutes zeros (representing no connection)
+        of the connectivitiy matrix by non-zero weights
+
+        parameters:
+            from_neuron: input neuron
+            to_neuron: receiving neuron
+            weight: weight of the connection
+        '''
+
+        self.connectivity_matrix[from_neuron, to_neuron] = weight
+
+
+
+    def adjust_input_matrix():
+        pass
+
+
+
+    def lif_integration(self, membrane_potentials, input_currents): #array or singular current?
         '''
         1) uses the LIF formula to calculate how spikes are integrated
 
-        input variables:
-            membrane_potentials: array of membrane potentials per each neuron
+        parameters:
+            membrane_potentials: array of membrane potentials of all neurons
             input_currents: array of input currents to each neuron as a sum of lateral and external input
 
         returns:
-            V: current voltage of the neuron
-            spiked: boolean of whether the neuron spiked
+            dV: array of current voltages of all neurons
+            spiked: array of booleans of whether or not the neuron spiked
 
         LIF formula: tau * dV/dt = -(V - E_L) + I/g_L
         LIF variables: tau= membrane time constant, dV= voltage to be conducted, dt= delta time= time step for the simulation
                         V= membrane potential, E_L= resting_potential, I= input current, g_L= leak conductance
         '''
         
-        
-        
         # Voltage update
-        # dV = noise + (-(membrane_potential - self.resting_potential) + input_current / self.g_L) / self.tau #LIF
+        # dV = -(membrane_potential - self.resting_potential) + input_current / self.g_L / self.tau #LIF
         # dV = noise + (-(V - self.resting_potential) / self.tau + I) # viktoriias
-        # dV = (self.resting_potential - self.membrane_potential + input_current) / self.tau * delta_time #GPT
-        # integrate the above update
-        V += dV * self.delta_time
+        dV = (-(membrane_potentials - self.resting_potential) + input_currents) / self.tau * self.delta_time
 
-        # refractory
+        #refractory
         #V[refr > 0] = self.resting_potential
         #refr[refr > 0] -= 1
 
         # if the neuron spiked, reset its voltage to the resting potential
-        spiked = V > self.threshold
-        V[spiked]    = self.resting_potential 
+        spiked = dV > self.threshold
+        dV[spiked]    = self.resting_potential
+        
         #refr[spiked] = self.t_refr / self.delta_time
 
-        return V, spiked
+        return dV, spiked
+    
+
     
     def simulate(self, time_steps, external_input=None):
         '''
@@ -85,9 +107,7 @@ class SNN:
         uses dot product of connectivity matrices
         2) records voltages and spikes for each timestep in arrays
 
-
-
-        input variables:
+        parameters:
             external_input: external input to the neuron
             time_steps: simulation time steps [ms]
 
@@ -96,23 +116,24 @@ class SNN:
             spikes: array of spikes per neuron #i think in 0 and 1, but maybe boolean?
         '''
 
-        delta_times    = np.arange(0, time_steps + self.delta_time, self.delta_time)      # simulation time steps [ms] ## why +self.delta_time?
-        voltage       = np.zeros((self.neurons, len(delta_times)))  # array for saving voltage history
-        voltage[:, 0] = self.resting_potential                                     # set initial voltage to resting potential
-        spikes        = np.zeros((self.neurons, len(delta_times)))  # initialize spike output
-        refr          = np.zeros((self.neurons,))
+        steps    = np.arange(0, time_steps + self.delta_time, self.delta_time)      # simulation time steps [ms] ## why +self.delta_time? one more i guess
+        voltage       = np.zeros((self.neurons, len(steps)))  # array for saving voltage history
+        voltage[:, 0] = self.resting_potential                # set initial voltage to resting potential
+        spikes        = np.zeros((self.neurons, len(steps)))  # initialise spike output
+        #refr          = np.zeros((self.neurons,))
 
         # simulation
-        for t in range(1, len(delta_times)):
+        for t in range(1, len(steps)):
             # calculate input to the model: a sum of the spiking inputs weighted by corresponding connections
             external_input = np.dot(self.input_matrix, external_input[:, t]) ## how does this work? do i need this, or easier with just making it one array? I assume external inputs is the spikes and the matrix the weighting, should be all 1 for me
-            lateral_input = np.dot(self.connectivity_matrix, spikes[:, t-1]) 
-            total_input = external_input + lateral_input
+            lateral_input = np.dot(self.connectivity_matrix, spikes[:, t-1]) # matrix*array=array
+            total_input = external_input + lateral_input #should be an array; arr+arr=arr
 
             # record voltage and record spikes
             voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input)
             
         return voltage, spikes
+    
 
 
 class Neuron:
