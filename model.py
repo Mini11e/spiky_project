@@ -1,56 +1,70 @@
 import numpy as np
 
 ######TO DO######
-# network propagates spikes but no time distinction = everything happens at the same time -> fix
 # add visualisation
+# add specifications of variable type in defs
 # add multiple connections
-# check lIF formula
-#(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
+# decide for a LIF formula
+# add a main and test SNN
 
+#(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
+# in LIF: threshold: -55, reset_voltage: -75, then formula with -
 
 import numpy as np
 
 class SNN:
-    def __init__(self, delta_time=1.0, threshold=-55, V_noise=0.0, resting_potential=-65, tau=10.0, g_L=10.0, t_refr=2.0,
-                 neurons=10, n_inputs=10, input_matrix=None, connectivity_matrix=None, w_inh=None,
-                 **kwargs):
+    def __init__(self, delta_time=1.0, threshold=-55, resting_potential=-65, tau=10.0,
+                 neurons=10, input_matrix=None, connectivity_matrix=None):
         '''
-        Simulate the activity of a LIF neuron.
+        1) SNN that conductions spikes in an interconnected network of LIF neurons
 
-        Args:
-            threshold     -- the threshold for neuron firing
-            V_noise   -- random noise added to the signal
-            delta_time        -- time step for the simulation
-            neurons -- number of neurons in the network
-            n_inputs  -- number of input sources to the neurons
-            input_matrix     -- feedforward connectivity matrix from the input layer to LIF layer
-            connectivity_matrix    -- lateral connectivity matrix within the LIF layer
-        Constant params:
-            g_L   -- leak of the conductance (inverse membrane resistance)
-            tau -- membrane time constant: how quickly membrane voltage returns to the resting state
-            resting_potential   -- resting potential (equal to voltage reset after spike)
+        input parameters:
+            delta_time: time step for the simulation
+            threshold: voltage threshold for when to spike
+            resting_potential: membrane potential at rest/same as reset voltage
+            tau: membrane time constant 
+            neurons: number of connected neurons in the network
+            input_matrix: good question??? weight matrix for how to forward external input, for me probably just 1 for each neuron that should be a staring neuron, 0 for all others
+            connectivity_matrix: weight matrix of inter-connecting neurons, 0 for no connection
+
         '''
-        self.delta_time    = delta_time
-        self.resting_potential   = resting_potential
+        self.delta_time = delta_time
+        self.resting_potential = resting_potential
         self.tau = tau
-        self.g_L   = g_L
-
-        self.threshold   = threshold
-        self.V_noise = V_noise
-        self.t_refr  = t_refr
-
-        self.n_inputs  = n_inputs
+        self.threshold = threshold
+    
         self.neurons = neurons
+        self.input_matrix = input_matrix
+        self.connectivity_matrix = connectivity_matrix
+
+        #self.t_refr = t_refr
+        #self.n_inputs = n_inputs
 
 
             
-    def _delta_time(self, V, I):
+    def lif_integration(self, membrane_potentials, input_currents):
+        '''
+        1) uses the LIF formula to calculate how spikes are integrated
+
+        input variables:
+            membrane_potentials: array of membrane potentials per each neuron
+            input_currents: array of input currents to each neuron as a sum of lateral and external input
+
+        returns:
+            V: current voltage of the neuron
+            spiked: boolean of whether the neuron spiked
+
+        LIF formula: tau * dV/dt = -(V - E_L) + I/g_L
+        LIF variables: tau= membrane time constant, dV= voltage to be conducted, dt= delta time= time step for the simulation
+                        V= membrane potential, E_L= resting_potential, I= input current, g_L= leak conductance
+        '''
+        
+        
         
         # Voltage update
-        noise   = np.random.rand() * self.V_noise
-        # insert your formula for the membrane potential (voltage) update
-        #dV = noise + (-(V - self.resting_potential) + I / self.g_L) / self.tau
-        dV = noise + (-(V - self.resting_potential) / self.tau + I)
+        # dV = noise + (-(membrane_potential - self.resting_potential) + input_current / self.g_L) / self.tau #LIF
+        # dV = noise + (-(V - self.resting_potential) / self.tau + I) # viktoriias
+        # dV = (self.resting_potential - self.membrane_potential + input_current) / self.tau * delta_time #GPT
         # integrate the above update
         V += dV * self.delta_time
 
@@ -58,20 +72,31 @@ class SNN:
         #V[refr > 0] = self.resting_potential
         #refr[refr > 0] -= 1
 
-        fired = V > self.threshold
+        # if the neuron spiked, reset its voltage to the resting potential
+        spiked = V > self.threshold
+        V[spiked]    = self.resting_potential 
+        #refr[spiked] = self.t_refr / self.delta_time
 
-        V[fired]    = self.resting_potential
-        #refr[fired] = self.t_refr / self.delta_time
-        return V, fired
+        return V, spiked
     
-    def simulate(self, length, external_input=None, input_scale=None):
+    def simulate(self, time_steps, external_input=None):
         '''
-        Args:
-            external_input -- input to the neuron
-            length         -- simulation length [ms]
+        1) calculates spike input per timestep as a sum of external inputs + lateral inputs of previous timestep
+        uses dot product of connectivity matrices
+        2) records voltages and spikes for each timestep in arrays
+
+
+
+        input variables:
+            external_input: external input to the neuron
+            time_steps: simulation time steps [ms]
+
+        returns:
+            voltages: array of voltages per neuron
+            spikes: array of spikes per neuron #i think in 0 and 1, but maybe boolean?
         '''
 
-        delta_times    = np.arange(0, length + self.delta_time, self.delta_time)      # simulation time steps [ms]
+        delta_times    = np.arange(0, time_steps + self.delta_time, self.delta_time)      # simulation time steps [ms] ## why +self.delta_time?
         voltage       = np.zeros((self.neurons, len(delta_times)))  # array for saving voltage history
         voltage[:, 0] = self.resting_potential                                     # set initial voltage to resting potential
         spikes        = np.zeros((self.neurons, len(delta_times)))  # initialize spike output
@@ -80,15 +105,12 @@ class SNN:
         # simulation
         for t in range(1, len(delta_times)):
             # calculate input to the model: a sum of the spiking inputs weighted by corresponding connections
-            external_input = np.dot(self.input_matrix, external_input[:, t])
+            external_input = np.dot(self.input_matrix, external_input[:, t]) ## how does this work? do i need this, or easier with just making it one array? I assume external inputs is the spikes and the matrix the weighting, should be all 1 for me
             lateral_input = np.dot(self.connectivity_matrix, spikes[:, t-1]) 
             total_input = external_input + lateral_input
 
-            #if total_input.sum() > 0:
-            #    print(t, total_input.nonzero()[0], external_input[:, t].nonzero()[0])
-
-            # update voltage and record spikes
-            voltage[:, t], spikes[:, t] = self._delta_time(voltage[:, t-1], total_input)
+            # record voltage and record spikes
+            voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input)
             
         return voltage, spikes
 
@@ -117,9 +139,7 @@ class Neuron:
             self.spike = True
             self.membrane_potential = self.reset_voltage  # Reset voltage after spiking
         else:
-            self.spike = False
-    
-        
+            self.spike = False    
 
 class SNN_:
     def __init__(self, num_neurons):
