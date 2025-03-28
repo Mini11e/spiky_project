@@ -94,7 +94,7 @@ class SNN:
         # if the neuron spiked, reset its voltage to the resting potential
         spiked = dV > self.threshold
         dV[spiked]    = self.resting_potential
-        
+
         #refr[spiked] = self.t_refr / self.delta_time
 
         return dV, spiked
@@ -130,6 +130,7 @@ class SNN:
             total_input = external_input + lateral_input #should be an array; arr+arr=arr
 
             # record voltage and record spikes
+            
             voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input)
             
         return voltage, spikes
