@@ -9,12 +9,12 @@ if __name__ == "__main__":
     # Connect neurons with random weights
     snn.connect(0, 1, 1)
     snn.connect(1, 2, 0)
+
+    # set input currents
+    snn.set_inputs()
     
-    # Simulate for 10 time steps with random input currents
-    for time_step in range(5):
-        input_currents = [1, 1, 1]  # Random input currents for each neuron
-        snn.update_network(input_currents)
-        # Print neuron voltages and spike states
-        for i, neuron in enumerate(snn.neurons):
-            print(f"Neuron {i}: Voltage = {neuron.prev_potential:.2f}, Spiked = {neuron.spike}")
+    # let the neuron run for x timesteps
+    snn.simulate()
+
+    # print array of voltages and spikes
             
