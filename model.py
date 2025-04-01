@@ -1,11 +1,10 @@
 import numpy as np
 
 ######TO DO######
-# add a main and test SNN
-# add multiple connections/def for establishing connection matrix?
+# read up on LIF formula
+# figure out reasonable (LIF) formula + threshold/resting potential values
 # add visualisation
 # add specifications of variable type in defs
-# play with parameters 
 
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
@@ -14,8 +13,8 @@ import numpy as np
 
 
 class SNN:
-    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
-                 num_neurons=10, num_inputs = 10, input_matrix=None, connectivity_matrix=None):
+    def __init__(self, delta_time=1.0, resting_potential=0.0, threshold=0.1, tau=10.0,
+                 num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None):
         '''
         1) SNN that conductions spikes in an interconnected network of LIF neurons
 
@@ -36,8 +35,8 @@ class SNN:
         self.neurons = num_neurons
         
         
-        self.input_matrix = np.zeros((num_neurons, time_steps)) #think about if this should be an array, generate input randomly, shu
-        self.connectivity_matrix = np.zeros((num_neurons, num_neurons)) 
+        self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
+        self.connectivity_matrix = np.zeros((num_neurons, num_neurons))
 
         #self.t_refr = t_refr
 
@@ -90,12 +89,11 @@ class SNN:
         LIF variables: tau= membrane time constant, dV= voltage to be conducted, dt= delta time= time step for the simulation
                         V= membrane potential, E_L= resting_potential, I= input current, g_L= leak conductance
         '''
-        
         # Voltage update
         # dV = -(membrane_potential - self.resting_potential) + input_current / self.g_L / self.tau #LIF
         # dV = noise + (-(V - self.resting_potential) / self.tau + I) # viktoriias
         dV = (-(membrane_potentials - self.resting_potential) + input_currents) / self.tau * self.delta_time
-
+        
         #refractory
         #V[refr > 0] = self.resting_potential
         #refr[refr > 0] -= 1
@@ -130,17 +128,24 @@ class SNN:
         voltage[:, 0] = self.resting_potential                # set initial voltage to resting potential
         spikes        = np.zeros((self.neurons, len(steps)))  # initialise spike output
         #refr          = np.zeros((self.neurons,))
-
+    
         # simulation
         for t in range(1, len(steps)):
             # calculate input to the model: a sum of the spiking inputs weighted by corresponding connections
             #external_input = np.dot(self.input_matrix, external_input[:, t])
-            external_input = self.input_matrix[:, t] # external input for each neuron at given timestep, take from matrix: all rows of column=t
+            external_input = self.input_matrix[:, t-1] # external input for each neuron at given timestep, take from matrix: all rows of column=t
             lateral_input = np.dot(self.connectivity_matrix, spikes[:, t-1]) # matrix*array=array
             total_input = external_input + lateral_input #arr+arr=arr
 
             # record voltage and spikes
             voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input)
+
+            # add visualise() per timestep
             
         return voltage, spikes
+    
+    def visualise():
+        # heatmap for voltages
+        # spikes as horizontal eventplot?
+        pass
     
