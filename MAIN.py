@@ -14,7 +14,10 @@ if __name__ == "__main__":
     snn.set_inputs()
     
     # let the neuron run for x timesteps
-    snn.simulate()
+    voltage, spikes = snn.simulate()
 
-    # print array of voltages and spikes
+    print(voltage)
+    print(spikes)
+
+
             

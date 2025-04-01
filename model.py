@@ -36,7 +36,7 @@ class SNN:
         self.neurons = num_neurons
         
         
-        self.input_matrix = np.zeros((num_neurons, num_neurons))
+        self.input_matrix = np.zeros((num_neurons, time_steps)) #think about if this should be an array, generate input randomly, shu
         self.connectivity_matrix = np.zeros((num_neurons, num_neurons)) 
 
         #self.t_refr = t_refr
