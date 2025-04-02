@@ -13,7 +13,7 @@ import numpy as np
 
 
 class SNN:
-    def __init__(self, delta_time=1.0, resting_potential=0.0, threshold=0.1, tau=10.0,
+    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
                  num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None):
         '''
         1) SNN that conductions spikes in an interconnected network of LIF neurons
@@ -33,6 +33,7 @@ class SNN:
         self.threshold = threshold
         self.tau = tau
         self.neurons = num_neurons
+        self.all_voltages = np.zeros((num_neurons, 2*(time_steps)))
         
         
         self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
@@ -73,16 +74,16 @@ class SNN:
 
 
 
-    def lif_integration(self, membrane_potentials, input_currents):
+    def lif_integration(self, V, input_currents, t):
         '''
         1) uses the LIF formula to calculate how spikes are integrated
 
         parameters:
-            membrane_potentials: array of membrane potentials of all neurons
+            V: array of membrane potentials of all neurons
             input_currents: array of input currents to each neuron as a sum of lateral and external input
 
         returns:
-            dV: array of current voltages of all neurons
+            V: array of voltages of all neurons after spikes
             spiked: array of booleans of whether or not the neuron spiked
 
         LIF formula: tau * dV/dt = -(V - E_L) + I/g_L
@@ -92,19 +93,24 @@ class SNN:
         # Voltage update
         # dV = -(membrane_potential - self.resting_potential) + input_current / self.g_L / self.tau #LIF
         # dV = noise + (-(V - self.resting_potential) / self.tau + I) # viktoriias
-        dV = (-(membrane_potentials - self.resting_potential) + input_currents) / self.tau * self.delta_time
-        
+        # V += dV * self.dt #viktoriias
+        dV = (-(V - self.resting_potential) + input_currents) / self.tau * self.delta_time
+        V += dV * self.delta_time
+        self.all_voltages[:,(2*t)-2] = V
+    
         #refractory
         #V[refr > 0] = self.resting_potential
         #refr[refr > 0] -= 1
 
         # if the neuron spiked, reset its voltage to the resting potential
-        spiked = dV > self.threshold
-        dV[spiked]    = self.resting_potential
+        spiked = V > self.threshold
+        V[spiked]    = self.resting_potential
+        print(spiked)
+        self.all_voltages[:,(2*t)-1] = V
 
         #refr[spiked] = self.t_refr / self.delta_time
 
-        return dV, spiked
+        return V, spiked
     
 
     
@@ -138,11 +144,14 @@ class SNN:
             total_input = external_input + lateral_input #arr+arr=arr
 
             # record voltage and spikes
-            voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input)
+            voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input, t)
 
             # add visualise() per timestep
+            print(self.all_voltages)
             
         return voltage, spikes
+    
+        
     
     def visualise():
         # heatmap for voltages
