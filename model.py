@@ -175,8 +175,10 @@ class SNN:
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))
-            for i in range(len(spikes[i])):
-                if spikes[i] == 1:
+            for k in range(len(spikes[i])):
+                print(spikes[1,2])
+
+                if spikes[i,k] == 1:
                     plot_spikes[j] = i
                     j += 1
 
