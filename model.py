@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 ######TO DO######
 # read up on LIF formula
@@ -34,6 +35,7 @@ class SNN:
         self.tau = tau
         self.neurons = num_neurons
         self.all_voltages = np.zeros((num_neurons, 2*(time_steps)))
+        self.time_steps = time_steps
         
         
         self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
@@ -153,8 +155,40 @@ class SNN:
     
         
     
-    def visualise():
+    def plot(self, spikes):
         # heatmap for voltages
         # spikes as horizontal eventplot?
-        pass
+            
+        fig, ax = plt.subplots(nrows = 2, ncols = self.neurons, sharex = True)
+        
+        fig.set_size_inches(10, 5)
+        dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
+        
+        # subplot for each neuron
+        for i in range(self.neurons):
+
+            ax[0][i].plot(dim1, self.all_voltages[i], label = "Voltage")
+            ax[0][i].set_xlabel('Timesteps')
+            ax[0][i].set_ylabel('Voltage')
+            ax[0][i].set_title(f"Neuron {i+1}")
+            ax[0][i].legend()
+
+            j = 0
+            plot_spikes = np.zeros(len(spikes[i]))
+            for i in range(len(spikes[i])):
+                if spikes[i] == 1:
+                    plot_spikes[j] = i
+                    j += 1
+
+            
+            ax[1][i].eventplot(plot_spikes, label = "Spikes")
+            ax[1][i].set_xlabel('Timesteps')
+            ax[1][i].set_ylabel('Spikes')
+            ax[1][i].set_title(f"Neuron {i+1}")
+            ax[1][i].legend()
+            
+            
+        
+        #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
+        plt.show()
     
