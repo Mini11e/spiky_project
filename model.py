@@ -107,7 +107,6 @@ class SNN:
         # if the neuron spiked, reset its voltage to the resting potential
         spiked = V > self.threshold
         V[spiked]    = self.resting_potential
-        print(spiked)
         self.all_voltages[:,(2*t)-1] = V
 
         #refr[spiked] = self.t_refr / self.delta_time
@@ -149,7 +148,6 @@ class SNN:
             voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input, t)
 
             # add visualise() per timestep
-            print(self.all_voltages)
             
         return voltage, spikes
     
@@ -158,36 +156,42 @@ class SNN:
     def plot(self, spikes):
         # heatmap for voltages
         # spikes as horizontal eventplot?
+
+        print(self.all_voltages)
             
-        fig, ax = plt.subplots(nrows = 2, ncols = self.neurons, sharex = True)
+        fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
         
         fig.set_size_inches(10, 5)
         dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
+
+        ax[0].plot([0, self.neurons], [self.threshold, self.threshold], color = "red")
         
         # subplot for each neuron
         for i in range(self.neurons):
 
-            ax[0][i].plot(dim1, self.all_voltages[i], label = "Voltage")
-            ax[0][i].set_xlabel('Timesteps')
-            ax[0][i].set_ylabel('Voltage')
-            ax[0][i].set_title(f"Neuron {i+1}")
-            ax[0][i].legend()
+            colors = ["green", "blue", "orange"]
+            
+
+            ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color =f'{colors[i]}' )
+            ax[0].set_xlabel('Timesteps')
+            ax[0].set_ylabel('Voltage')
+            ax[0].set_title(f"Voltages")
+            ax[0].legend()
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))
             for k in range(len(spikes[i])):
-                print(spikes[1,2])
 
                 if spikes[i,k] == 1:
                     plot_spikes[j] = i
                     j += 1
 
             
-            ax[1][i].eventplot(plot_spikes, label = "Spikes")
-            ax[1][i].set_xlabel('Timesteps')
-            ax[1][i].set_ylabel('Spikes')
-            ax[1][i].set_title(f"Neuron {i+1}")
-            ax[1][i].legend()
+            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = -i, linelengths= 0.5, color = f'{colors[i]}')
+            ax[1].set_xlabel('Timesteps')
+            ax[1].set_ylabel('Spikes')
+            ax[1].set_title(f"Spikes")
+            ax[1].legend()
             
             
         
