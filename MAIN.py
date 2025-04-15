@@ -1,6 +1,11 @@
 import numpy as np
 import model
 
+######TO DO######
+# play around with inputs that provoke a spike
+# create larger interconnected network
+# add specifications of variable type in defs
+
 
 if __name__ == "__main__":
     # Create a spiking neural network with x neurons
