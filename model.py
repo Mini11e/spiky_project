@@ -57,7 +57,7 @@ class SNN:
             weight: weight of the connection
         '''
 
-        self.connectivity_matrix[from_neuron, to_neuron] = weight
+        self.connectivity_matrix[to_neuron, from_neuron] = weight
 
 
 
