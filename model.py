@@ -35,6 +35,8 @@ class SNN:
         self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
         self.connectivity_matrix = np.zeros((num_neurons, num_neurons))
 
+        self.noise = np.random.normal(loc=0.85, scale=0.2, size=(self.neurons, time_steps)).clip(0, None)
+
         #self.t_refr = t_refr
 
 
@@ -90,8 +92,9 @@ class SNN:
         # dV = -(membrane_potential - self.resting_potential) + input_current / self.g_L / self.tau #LIF
         # dV = noise + (-(V - self.resting_potential) / self.tau + I) # viktoriias
         # V += dV * self.dt #viktoriias
-        dV = (-(V - self.resting_potential) + input_currents) / self.tau * self.delta_time
+        dV = self.noise[:,t-1] + (-(V - self.resting_potential) + input_currents) / self.tau * self.delta_time
         V += dV * self.delta_time
+
         self.all_voltages[:,(2*t)-2] = V
     
         #refractory
@@ -158,19 +161,19 @@ class SNN:
         fig.set_size_inches(10, 5)
         dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
 
-        ax[0].plot([0, self.neurons], [self.threshold, self.threshold], color = "red")
+        ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
         
         # subplot for each neuron
         for i in range(self.neurons):
 
-            colors = ["green", "blue", "orange"]
+            colors = ["green", "blue", "orange", "yellow", "lightblue", "lightgreen", "purple", "lightyellow", "darkgreen", "violet"]
             
 
-            ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color =f'{colors[i]}' )
+            ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color =f'{colors[i]}')
             ax[0].set_xlabel('Timesteps')
             ax[0].set_ylabel('Voltage')
             ax[0].set_title(f"Voltages")
-            ax[0].legend()
+            ax[0].legend(loc = "upper right")
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))

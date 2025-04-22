@@ -2,35 +2,34 @@ import numpy as np
 import model
 
 ######TO DO######
-# add back input matrix
-# play around with inputs that provoke a spike
+# fix plotting of spikes
+# plot regular vltage instead of all voltages
+
 # create larger interconnected network
 # add specifications of variable type in defs
-# change the way spikes are recorded for plotting
-
-#### questions:
-# how many neurons? 100?
-# how man connections? each connected to one max?
-# steps for neuron activations in the beginning: for 100n, 1, 10, 20, 30, 50, 75, 90?
 
 
 if __name__ == "__main__":
     # Create a spiking neural network with x neurons
-    snn = model.SNN(num_neurons=3, time_steps=3)
+    snn = model.SNN(num_neurons=10, time_steps=50)
 
     # Connect neurons with random weights
-    #snn.connect(0, 1, 20)
-    snn.connect(0, 2, 100)
-    snn.connect(1, 2, 300)
+    snn.connect(1, 2, 30)
+    snn.connect(1, 4, 30)
+    snn.connect(2, 3, 30)
+    snn.connect(4, 3, 30)
+    snn.connect(4, 5, 30)
+    snn.connect(3, 6, 30)
+    snn.connect(6, 0, 30)
 
     # set input currents
-    snn.set_inputs(0,0,20)
-    snn.set_inputs(1,0,200)
-    snn.set_inputs(2,1,200)
+    snn.set_inputs(1,25,30)
+    snn.set_inputs(1,0,0)
+    snn.set_inputs(2,0,0)
 
     
     # let the neuron run for x timesteps
-    voltage, spikes = snn.simulate(time_steps=3)
+    voltage, spikes = snn.simulate(time_steps=50)
 
     print(voltage)
     print(spikes)
