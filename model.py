@@ -1,12 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-######TO DO######
-# read up on LIF formula
-# figure out reasonable (LIF) formula + threshold/resting potential values
-# add visualisation
-# add specifications of variable type in defs
-
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
 # in LIF: threshold: -55, reset_voltage: -75, then formula with -

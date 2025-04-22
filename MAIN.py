@@ -2,9 +2,16 @@ import numpy as np
 import model
 
 ######TO DO######
+# add back input matrix
 # play around with inputs that provoke a spike
 # create larger interconnected network
 # add specifications of variable type in defs
+# change the way spikes are recorded for plotting
+
+#### questions:
+# how many neurons? 100?
+# how man connections? each connected to one max?
+# steps for neuron activations in the beginning: for 100n, 1, 10, 20, 30, 50, 75, 90?
 
 
 if __name__ == "__main__":
