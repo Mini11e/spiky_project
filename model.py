@@ -35,6 +35,7 @@ class SNN:
         self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
         self.connectivity_matrix = np.zeros((num_neurons, num_neurons))
 
+        # good noise parameters: loc=0.85, scale = 0.2
         self.noise = np.random.normal(loc=0.85, scale=0.2, size=(self.neurons, time_steps)).clip(0, None)
 
         #self.t_refr = t_refr
@@ -180,11 +181,12 @@ class SNN:
             for k in range(len(spikes[i])):
 
                 if spikes[i,k] == 1:
-                    plot_spikes[j] = i
+                    plot_spikes[j] = k
                     j += 1
-
-            
-            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = -i, linelengths= 0.5, color = f'{colors[i]}')
+                
+            print("plotspikes")
+            print(plot_spikes)
+            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = f'{colors[i]}')
             ax[1].set_xlabel('Timesteps')
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")

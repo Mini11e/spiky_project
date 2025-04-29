@@ -33,6 +33,7 @@ if __name__ == "__main__":
 
     print(voltage)
     print(spikes)
+    print(spikes[0])
 
     snn.plot(spikes)
 
