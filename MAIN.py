@@ -24,8 +24,6 @@ if __name__ == "__main__":
 
     # set input currents
     snn.set_inputs(1,25,30)
-    snn.set_inputs(1,0,0)
-    snn.set_inputs(2,0,0)
 
     
     # let the neuron run for x timesteps
