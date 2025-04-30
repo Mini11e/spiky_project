@@ -158,7 +158,7 @@ class SNN:
 
         print(self.all_voltages)
             
-        fig, ax = plt.subplots(nrows = 1, ncols = 3, sharex = True)
+        fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
         
         fig.set_size_inches(10, 5)
         dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
@@ -193,16 +193,19 @@ class SNN:
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")
             ax[1].legend()
-
-            
-            
-        g = nx.DiGraph()
-        g.add_edges_from([('1', '2'), ('1', '4'), ('2', '3'), ('4', '3'), ('4', '5'), ('3', '6'), ('6', '0')])
-            
-        nx.draw(g)
-            
+        
             
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
         plt.show()
+
+    def graph(self):
+
+        g = nx.DiGraph()
+        g.add_edges_from([('1', '2'), ('1', '4'), ('2', '3'), ('4', '3'), ('4', '5'), ('3', '6'), ('6', '0')])
+            
+        nx.draw(g)
+        plt.show()
+
+
     

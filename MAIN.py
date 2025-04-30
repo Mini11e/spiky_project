@@ -35,6 +35,7 @@ if __name__ == "__main__":
     print(spikes)
     print(spikes[0])
 
+    snn.graph()
     snn.plot(spikes)
 
             
