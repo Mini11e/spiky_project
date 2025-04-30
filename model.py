@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
 
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
@@ -157,7 +158,7 @@ class SNN:
 
         print(self.all_voltages)
             
-        fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
+        fig, ax = plt.subplots(nrows = 1, ncols = 3, sharex = True)
         
         fig.set_size_inches(10, 5)
         dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
@@ -174,7 +175,7 @@ class SNN:
             ax[0].set_xlabel('Timesteps')
             ax[0].set_ylabel('Voltage')
             ax[0].set_title(f"Voltages")
-            ax[0].legend(loc = "upper right")
+            #ax[0].legend(loc = "upper left")
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))
@@ -183,6 +184,7 @@ class SNN:
                 if spikes[i,k] == 1:
                     plot_spikes[j] = k
                     j += 1
+            plot_spikes = plot_spikes[plot_spikes != 0]
                 
             print("plotspikes")
             print(plot_spikes)
@@ -191,6 +193,13 @@ class SNN:
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")
             ax[1].legend()
+
+            
+            
+        g = nx.DiGraph()
+        g.add_edges_from([('1', '2'), ('1', '4'), ('2', '3'), ('4', '3'), ('4', '5'), ('3', '6'), ('6', '0')])
+            
+        nx.draw(g)
             
             
         
