@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+import random
 
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
@@ -40,6 +41,12 @@ class SNN:
         self.noise = np.random.normal(loc=0.85, scale=0.2, size=(self.neurons, time_steps)).clip(0, None)
 
         #self.t_refr = t_refr
+
+        random.seed(30)
+        self.neuron_colours = []
+        for i in range(self.neurons):
+            self.neuron_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
+
 
 
 
@@ -171,7 +178,7 @@ class SNN:
             colors = ["green", "blue", "orange", "yellow", "lightblue", "lightgreen", "purple", "lightyellow", "darkgreen", "violet"]
             
 
-            ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color =f'{colors[i]}')
+            ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color = self.neuron_colours[i])
             ax[0].set_xlabel('Timesteps')
             ax[0].set_ylabel('Voltage')
             ax[0].set_title(f"Voltages")
@@ -188,7 +195,7 @@ class SNN:
                 
             print("plotspikes")
             print(plot_spikes)
-            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = f'{colors[i]}')
+            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
             ax[1].set_xlabel('Timesteps')
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")
@@ -201,10 +208,28 @@ class SNN:
 
     def graph(self):
 
+        seed = 30133  # Seed random number generators for reproducibility
+
         g = nx.DiGraph()
-        g.add_edges_from([('1', '2'), ('1', '4'), ('2', '3'), ('4', '3'), ('4', '5'), ('3', '6'), ('6', '0')])
+        
+        #color_map = ["green", "green","green","green","green","green","green","green","green","blue"]
+        connected_nodes = []   
+        
+        for i in range(self.neurons):
+            for j in range(self.neurons):
+                if self.connectivity_matrix[i][j] != 0:
+                    g.add_edge(i, j, weight = self.connectivity_matrix[i][j])
+                    connected_nodes.append(i)
+                    connected_nodes.append(j)
+        
+        for k in range(self.neurons):
+           if k not in connected_nodes:
+              g.add_node(k)
+
+        pos = nx.spring_layout(g, k = 2, seed=seed)
             
-        nx.draw(g)
+        nx.draw(g, node_color=self.neuron_colours, pos=pos, with_labels=True)
+                
         plt.show()
 
 

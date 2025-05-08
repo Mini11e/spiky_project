@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 
 
@@ -19,4 +20,9 @@ if __name__ == "__main__":
     
     print(t)
 
+    random.seed(30)
+    ca = []
+    for i in range(8):
+            ca.append('#%06X' % random.randint(0, 0xFFFFFF))
+    print(ca)
 
