@@ -212,13 +212,12 @@ class SNN:
 
         g = nx.DiGraph()
         
-        #color_map = ["green", "green","green","green","green","green","green","green","green","blue"]
         connected_nodes = []   
         
         for i in range(self.neurons):
             for j in range(self.neurons):
                 if self.connectivity_matrix[i][j] != 0:
-                    g.add_edge(i, j, weight = self.connectivity_matrix[i][j])
+                    g.add_edge(j, i, weight = self.connectivity_matrix[i][j])
                     connected_nodes.append(i)
                     connected_nodes.append(j)
         
@@ -226,9 +225,14 @@ class SNN:
            if k not in connected_nodes:
               g.add_node(k)
 
-        pos = nx.spring_layout(g, k = 2, seed=seed)
+        colours = {}
+        for m in range(self.neurons):
+            colours[m] = self.neuron_colours[m]
+
+        # pos = nx.spring_layout(g, k = 4, seed=seed)
+        pos = nx.circular_layout(g)
             
-        nx.draw(g, node_color=self.neuron_colours, pos=pos, with_labels=True)
+        nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
                 
         plt.show()
 
