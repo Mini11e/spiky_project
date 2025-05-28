@@ -64,6 +64,18 @@ class SNN:
 
         self.connectivity_matrix[to_neuron, from_neuron] = weight
 
+    
+    def auto_connect(self, percentage, weight):
+
+        
+        random.seed(30)
+        for i in range(self.neurons):
+            for j in range(round(self.neurons*percentage)):
+                random_neuron = random.randint(0, self.neurons-1)
+
+                if random_neuron !=i:
+                    self.connect(i, random_neuron, weight)
+
 
 
     def set_inputs(self, neuron, timestep, input_current):
@@ -161,9 +173,6 @@ class SNN:
     
     def plot(self, spikes):
         # heatmap for voltages
-        # spikes as horizontal eventplot?
-
-        print(self.all_voltages)
             
         fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
         
@@ -173,10 +182,7 @@ class SNN:
         ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
         
         # subplot for each neuron
-        for i in range(self.neurons):
-
-            colors = ["green", "blue", "orange", "yellow", "lightblue", "lightgreen", "purple", "lightyellow", "darkgreen", "violet"]
-            
+        for i in range(self.neurons):            
 
             ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color = self.neuron_colours[i])
             ax[0].set_xlabel('Timesteps')
@@ -199,9 +205,7 @@ class SNN:
             ax[1].set_xlabel('Timesteps')
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")
-            ax[1].legend()
-        
-            
+            ax[1].legend(loc = "upper left", prop={'size': 6})
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
         plt.show()
