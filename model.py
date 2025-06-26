@@ -11,7 +11,7 @@ import random
 
 class SNN:
     def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
-                 num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=10000):
+                 num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000):
         '''
         1) SNN that conductions spikes in an interconnected network of LIF neurons
 
@@ -38,14 +38,15 @@ class SNN:
 
         
         
-        self.input_matrix = np.zeros((num_neurons, time_steps+1)) #think about if this should be an array, generate input randomly, shu
+        self.input_matrix = np.zeros((num_neurons, time_steps+1))
         self.connectivity_matrix = np.zeros((num_neurons, num_neurons))
 
-        # good noise parameters: loc=0.85, scale = 0.2
-        self.noise = np.random.normal(loc=0.85, scale=0.2, size=(self.neurons, time_steps)).clip(0, None)
+        # good noise parameters: loc=0.85, scale = 0.2 # .clip(0, None) to remove anything below 0
+        self.noise = np.random.normal(loc=1.000001, scale=0.05, size=(self.neurons, time_steps))
 
-        #self.t_refr = t_refr
-
+        # self.t_refr = t_refr
+        
+        # colour scheme seed
         random.seed(30)
         self.neuron_colours = []
         for i in range(self.neurons):
@@ -71,7 +72,15 @@ class SNN:
     
     def auto_connect(self, percentage, weight):
 
-        
+        #seed: 30
+        #seed: 105
+        distribute_func = lambda m, n: (lambda base, remainder: [base + (1 if i < remainder else 0)for i in range(n)])(m // n,m % n)
+        connections_per_neuron = distribute_func((round(self.neurons*percentage*self.neurons)), self.neurons)
+        print("ooooo")
+        print(connections_per_neuron)
+        random.seed(30)
+        np.random.shuffle(connections_per_neuron)
+
         random.seed(30)
         for i in range(self.neurons):
             for j in range(round(self.neurons*percentage)):
@@ -214,13 +223,12 @@ class SNN:
             ax[1].set_ylabel('Spikes')
             ax[1].set_title(f"Spikes")
             ax[1].legend(loc = "upper left", prop={'size': 6})
+            #ax[1].set_xlim([1800,2000])
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
         plt.show()
 
     def graph(self):
-
-        seed = 30133  # Seed random number generators for reproducibility
 
         g = nx.DiGraph()
         
