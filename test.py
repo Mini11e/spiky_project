@@ -15,12 +15,14 @@ if __name__ == "__main__":
     percentage = 0.13
     neurons = 20
 
-    random.seed(30)
+    
     distribute_func = lambda m, n: (lambda base, remainder: [base + (1 if i < remainder else 0)for i in range(n)])(m // n,m % n)
     connections_per_neuron = distribute_func((round(neurons*percentage*neurons)), neurons)
     print("ooooo")
     print(connections_per_neuron)
+    np.random.seed(30)
     np.random.shuffle(connections_per_neuron)
     print(connections_per_neuron)
+    print(connections_per_neuron[1])
 
         

@@ -13,27 +13,14 @@ import model
 
 if __name__ == "__main__":
     # Create a spiking neural network with x neurons
-    timesteps = 200
+    timesteps = 2000
 
     snn = model.SNN(num_neurons=20, time_steps=timesteps)
 
     # Connect neurons with
-    snn.auto_connect(0.125, 13)
-    snn.connect(13, 6, 13)
-    snn.connect(16, 2, 13)
+    snn.auto_connect(0.15, 13, 3)
 
-    # set input currents
-    '''
-    snn.set_inputs(1, 25, 40)
-    snn.set_inputs(3, 25, 40)
-    snn.set_inputs(5, 25, 40)
-    snn.set_inputs(7, 25, 40)
-    snn.set_inputs(9, 25, 40)
-    snn.set_inputs(11, 25, 40)
-    snn.set_inputs(13, 25, 40)
-    snn.set_inputs(15, 25, 40)
-    snn.set_inputs(17, 25, 40)
-    snn.set_inputs(19, 25, 40)'''
+    # loc 1-1.5, scale 0-0.5, step 0.1
 
     # let the neuron run for x timesteps
     voltage, spikes = snn.simulate(time_steps=timesteps)
