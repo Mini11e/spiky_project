@@ -45,7 +45,7 @@ class SNN:
         self.plot_xlim = plot_xlim
 
         # good noise parameters: loc=0.85, scale = 0.2 # .clip(0, None) to remove anything below 0
-        self.noise = np.random.normal(loc=1, scale=0, size=(self.neurons, time_steps))
+        self.noise = np.random.normal(loc=self.loc, scale=self.scale, size=(self.neurons, time_steps))
         
 
         # self.t_refr = t_refr
@@ -235,7 +235,10 @@ class SNN:
             ax[1].set_xlim(self.plot_xlim)
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
+        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc}, Scale={self.scale}')
+        plt.savefig(f'spiky_project/experiments/loc{self.loc}_scale{self.scale}.png')
         plt.show()
+        plt.close()
 
     def graph(self):
 

@@ -15,18 +15,27 @@ if __name__ == "__main__":
     # Create a spiking neural network with x neurons
     timesteps = 2000
 
-    snn = model.SNN(num_neurons=20, time_steps=timesteps)
+    locs = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    scales = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
 
-    # Connect neurons with
-    snn.auto_connect(0.15, 13, 3)
+    for s in locs:
+        for t in scales:
+
+            snn = model.SNN(num_neurons=20, time_steps=timesteps, loc = s, scale = t, plot_xlim = [1800,2000])
+            snn.auto_connect(0.15, 13, 3)
+            # let the neuron run for x timesteps
+            voltage, spikes = snn.simulate(time_steps=timesteps)
+            snn.plot(spikes)
+            #snn.graph()
+            
+
+    
+    
 
     # loc 1-1.5, scale 0-0.5, step 0.1
 
-    # let the neuron run for x timesteps
-    voltage, spikes = snn.simulate(time_steps=timesteps)
-
+    
     # plot network, voltage and spikes
-    snn.graph()
-    snn.plot(spikes)
+    
 
             
