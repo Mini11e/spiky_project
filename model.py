@@ -195,6 +195,19 @@ class SNN:
             
         return voltage, spikes
     
+
+    def rsync_measure(self, firings):
+        tau = 3.0  # ms
+        exp_kernel_time_steps = np.arange(0, tau * 10, 1)
+        decay = np.exp(-exp_kernel_time_steps / tau)
+        exp_kernel = decay
+        #exp_convolve = np.convolve(firings, exp_kernel, 'same')
+
+        #firings = np.apply_along_axis(exp_convolve, 1, firings)
+        num = np.var(np.mean(firings, axis=0))  # spatial mean across cells, at each time
+        den = np.mean(np.var(firings, axis=1))  # variance over time of each cell
+        return num / (den + 1e-100)
+    
         
     
     def plot(self, spikes):
@@ -267,6 +280,9 @@ class SNN:
         nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
                 
         plt.show()
+
+
+    
 
 
     

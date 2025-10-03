@@ -2,11 +2,9 @@ import numpy as np
 import model
 
 ######TO DO######
-# cut off at certain spike count
 # add refractory period?
-# add different amounts of input
+# add different amounts of input?
 # simulate different patterns
-# self.time_steps in simulate()
 
 # add specifications of variable type in defs
 
@@ -15,8 +13,8 @@ if __name__ == "__main__":
     # Create a spiking neural network with x neurons
     timesteps = 2000
 
-    locs = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
-    scales = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    locs = [1.0, 1.1] #[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    scales = [0.3, 0.5] #[0, 0.1, 0.2, 0.3, 0.4, 0.5]
 
     for s in locs:
         for t in scales:
@@ -25,6 +23,10 @@ if __name__ == "__main__":
             snn.auto_connect(0.15, 13, 3)
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
+            rsync = snn.rsync_measure(spikes)
+            print("STEAK")
+            print(rsync)
+
             snn.plot(spikes)
             #snn.graph()
             
