@@ -251,7 +251,6 @@ class SNN:
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc}, Scale={self.scale}')
         plt.savefig(f'spiky_project/experiments/loc{self.loc}_scale{self.scale}.png')
         plt.show()
-        plt.close()
 
     def graph(self):
 
@@ -282,6 +281,10 @@ class SNN:
         plt.show()
 
 
+    def plot_synchrony(self, df):
+
+        plt.scatter(x=df["x"], y=df["y"], s=df["z"]*10000, alpha=0.5)
+        plt.show()
     
 
 
