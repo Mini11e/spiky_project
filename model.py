@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import random
+import seaborn as sns
 
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
@@ -283,8 +284,25 @@ class SNN:
 
     def plot_synchrony(self, df):
 
-        plt.scatter(x=df["x"], y=df["y"], s=df["z"]*10000, alpha=0.5)
+        #plt.scatter(x=df["x"], y=df["y"], s=df["z"]*10000, alpha=0.5)
+        #plt.show()
+
+        
+        sns.set_theme()
+        
+
+        df1 = (
+        df.pivot(index="y", columns="x", values="z")
+        )
+
+       
+
+        # Draw a heatmap with the numeric values in each cell
+        f, ax = plt.subplots(figsize=(9, 6))
+        sns.heatmap(data = df1, annot = True, linewidths=.5, ax=ax, cmap = sns.color_palette("YlOrBr", as_cmap=True))
+        ax.set(xlabel="locs", ylabel="scales")
         plt.show()
+    
     
 
 

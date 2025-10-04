@@ -14,8 +14,8 @@ if __name__ == "__main__":
     # Create a spiking neural network with x neurons
     timesteps = 2000
 
-    locs = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
-    scales = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    locs = [1.0, 1.5] #[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    scales = [0.1,0.5] # [0, 0.1, 0.2, 0.3, 0.4, 0.5]
     rsyncs = np.zeros(len(locs)*len(scales))
     counter = 0
 
