@@ -9,13 +9,15 @@ import pandas as pd
 
 # add specifications of variable type in defs
 
+#heatmap spike counts per locs and scales
+
 
 if __name__ == "__main__":
     # Create a spiking neural network with x neurons
     timesteps = 2000
 
-    locs = [1.0, 1.5] #[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
-    scales = [0.1,0.5] # [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    locs = np.linspace(0.8, 1.5, 5) #[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    scales = np.linspace(0.1, 0.5, 5) #[0, 0.1, 0.2, 0.3, 0.4, 0.5]
     rsyncs = np.zeros(len(locs)*len(scales))
     counter = 0
 
@@ -24,6 +26,8 @@ if __name__ == "__main__":
       'y': rsyncs,
       'z': rsyncs
     })
+
+    ##fig, ax = plt.subplots(nrows =, ncols =)
 
     for s in locs:
         for t in scales:
@@ -41,7 +45,7 @@ if __name__ == "__main__":
 
             counter += 1
             
-            snn.plot(spikes)
+            ##ax[i, j].imshow(snn.plot(spikes))
             #snn.graph()
 
     print("NOSTEAK")
