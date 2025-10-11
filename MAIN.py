@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
             counter += 1
             
-            ##ax[i, j].imshow(snn.plot(spikes))
+            ##ax[i, j].imshow(snn.plot(spikes)) or plt,imshow[ ax =]
             #snn.graph()
 
     print("NOSTEAK")
