@@ -251,9 +251,9 @@ class SNN:
             ax[1].set_xlim(self.plot_xlim)
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
-        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc}, Scale={self.scale}')
-        plt.savefig(f'spiky_project/experiments/loc{self.loc}_scale{self.scale}.png')
-        plt.show()
+        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
+        plt.savefig(f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png')
+        return fig
 
     def graph(self):
 

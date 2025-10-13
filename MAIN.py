@@ -1,6 +1,12 @@
 import numpy as np
 import model
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
+import matplotlib.cm as cm
+from matplotlib.patches import PathPatch
+from matplotlib.path import Path
+
 
 ######TO DO######
 # add refractory period?
@@ -16,10 +22,12 @@ if __name__ == "__main__":
     # Create a spiking neural network with x neurons
     timesteps = 2000
 
-    locs = np.linspace(0.8, 1.5, 5) #[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
-    scales = np.linspace(0.1, 0.5, 5) #[0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    locs = np.linspace(0.8, 1.5, 5)#[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    scales = np.linspace(0.1, 0.5, 5)#[0, 0.1, 0.2, 0.3, 0.4, 0.5]
     rsyncs = np.zeros(len(locs)*len(scales))
     counter = 0
+    lenlocs = 0
+    lenscales = 0
 
     df = pd.DataFrame({
       'x': rsyncs,
@@ -27,8 +35,9 @@ if __name__ == "__main__":
       'z': rsyncs
     })
 
-    ##fig, ax = plt.subplots(nrows =, ncols =)
-
+    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales)+1)
+  
+    
     for s in locs:
         for t in scales:
 
@@ -36,22 +45,27 @@ if __name__ == "__main__":
             snn.auto_connect(0.15, 13, 3)
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
+           
             rsync = snn.rsync_measure(spikes)
-            print("STEAK")
-            print(rsync)
+          
             df["x"][counter] = s
             df["y"][counter] = t
             df["z"][counter] = rsync
 
+            ax[lenlocs, lenscales] = snn.plot(spikes)
+
+            
+            
+            #snn.graph()
             counter += 1
             
-            ##ax[i, j].imshow(snn.plot(spikes)) or plt,imshow[ ax =]
-            #snn.graph()
+        lenscales += 1
+        lenlocs += 1
+            
 
-    print("NOSTEAK")
-    print(df.head())        
+    plt.show()       
 
-    snn.plot_synchrony(df)
+    #snn.plot_synchrony(df)
             
 
     
