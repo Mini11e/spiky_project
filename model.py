@@ -83,7 +83,6 @@ class SNN:
         count_inputs = np.zeros(self.neurons)
         distribute_func = lambda m, n: (lambda base, remainder: [base + (1 if i < remainder else 0)for i in range(n)])(m // n,m % n)
         connections_per_neuron = distribute_func((round(self.neurons*percentage*self.neurons)), self.neurons)
-        print(connections_per_neuron)
         np.random.seed(30)
         np.random.shuffle(connections_per_neuron)
 
@@ -150,8 +149,8 @@ class SNN:
         V[spiked]    = self.resting_potential
         self.all_voltages[:,(2*t)-1] = V
 
-        self.spikes_num += sum(spiked)
-        print(self.spikes_num)
+        #self.spikes_num += sum(spiked)
+        #print(self.spikes_num)
 
         #refr[spiked] = self.t_refr / self.delta_time
 
@@ -216,44 +215,49 @@ class SNN:
     def plot(self, spikes):
         # heatmap for voltages
             
-        fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
-        
-        fig.set_size_inches(10, 5)
-        dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
+        #fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
+        fig, ax = plt.subplots(nrows = 1, ncols = 1, sharex = True)
 
-        ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
+        #fig.set_size_inches(10, 5)
+        #dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
+
+        #ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
         
         # subplot for each neuron
         for i in range(self.neurons):            
 
+            '''
             ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color = self.neuron_colours[i])
             ax[0].set_xlabel('Timesteps')
             ax[0].set_ylabel('Voltage')
             ax[0].set_title(f"Voltages")
             #ax[0].legend(loc = "upper left")
+            '''
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))
             for k in range(len(spikes[i])):
-
                 if spikes[i,k] == 1:
                     plot_spikes[j] = k
                     j += 1
+
             plot_spikes = plot_spikes[plot_spikes != 0]
-                
-            print("plotspikes")
-            print(plot_spikes)
-            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
-            ax[1].set_xlabel('Timesteps')
-            ax[1].set_ylabel('Spikes')
-            ax[1].set_title(f"Spikes")
-            ax[1].legend(loc = "upper left", prop={'size': 6})
-            ax[1].set_xlim(self.plot_xlim)
+            
+            ax.eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
+            ax.set_xlabel('Timesteps')
+            ax.set_ylabel('Spikes')
+            ax.set_title(f"Spikes")
+            ax.legend(loc = "upper left", prop={'size': 6})
+            ax.set_xlim(self.plot_xlim)
         
         #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
-        plt.savefig(f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png')
-        return fig
+        title = f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png'
+        plt.savefig(title)
+        plt.close()
+
+        #return fig, title
+        return title
 
     def graph(self):
 
@@ -281,29 +285,22 @@ class SNN:
             
         nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
                 
-        plt.show()
+        plt.savefig("spiky_project/experiments/graph")
 
 
     def plot_synchrony(self, df):
-
-        #plt.scatter(x=df["x"], y=df["y"], s=df["z"]*10000, alpha=0.5)
-        #plt.show()
-
         
         sns.set_theme()
-        
-
+    
         df1 = (
         df.pivot(index="y", columns="x", values="z")
         )
-
-       
 
         # Draw a heatmap with the numeric values in each cell
         f, ax = plt.subplots(figsize=(9, 6))
         sns.heatmap(data = df1, annot = True, linewidths=.5, ax=ax, cmap = sns.color_palette("YlOrBr", as_cmap=True))
         ax.set(xlabel="locs", ylabel="scales")
-        plt.show()
+        plt.savefig("spiky_project/experiments/synchrony_heatmap")
     
     
 

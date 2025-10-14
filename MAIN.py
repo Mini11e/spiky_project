@@ -2,6 +2,7 @@ import numpy as np
 import model
 import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
 import matplotlib.cbook as cbook
 import matplotlib.cm as cm
 from matplotlib.patches import PathPatch
@@ -35,7 +36,15 @@ if __name__ == "__main__":
       'z': rsyncs
     })
 
-    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales)+1)
+    df2 = pd.DataFrame({
+      'x': rsyncs,
+      'y': rsyncs,
+      'z': rsyncs
+    })
+
+    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales))
+    fig.set_figwidth(50)
+    fig.set_figheight(30)
   
     
     for s in locs:
@@ -52,20 +61,25 @@ if __name__ == "__main__":
             df["y"][counter] = t
             df["z"][counter] = rsync
 
-            ax[lenlocs, lenscales] = snn.plot(spikes)
+            df2["x"][counter] = s
+            df2["y"][counter] = t
+            df2["z"][counter] = rsync
 
-            
-            
-            #snn.graph()
+            title = snn.plot(spikes)
+
+            img = Image.open(title)
+            ax[lenlocs, lenscales].imshow(img)
+          
             counter += 1
             
-        lenscales += 1
+            lenscales += 1
+        lenscales = 0
         lenlocs += 1
             
-
-    plt.show()       
-
-    #snn.plot_synchrony(df)
+      
+    plt.savefig("spiky_project/experiments/tessst")
+    snn.plot_synchrony(df)
+    snn.graph()
             
 
     
