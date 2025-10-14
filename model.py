@@ -288,19 +288,41 @@ class SNN:
         plt.savefig("spiky_project/experiments/graph")
 
 
-    def plot_synchrony(self, df):
+    def plot_synchrony(self, df1, df2):
         
         sns.set_theme()
     
         df1 = (
-        df.pivot(index="y", columns="x", values="z")
+        df1.pivot(index="y", columns="x", values="z")
+        )
+
+        df2 = (
+            df2.pivot(index="y", columns="x", values="z")
+        )
+
+        # Draw a heatmap with the numeric values in each cell
+        f, ax = plt.subplots(nrows = 1, ncols = 2, figsize=(50, 30))
+        heatmap1 = sns.heatmap(data = df1, annot = True, linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
+        heatmap1.set(xlabel="locs", ylabel="scales")
+        heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
+        heatmap2.set(xlabel="locs", ylabel="scales")
+        plt.savefig("spiky_project/experiments/synchrony_heatmap")
+
+    
+    def plot_spike_numbers(self, df):
+        sns.set_theme()
+    
+        df1 = (
+            df.pivot(index="y", columns="x", values="z")
         )
 
         # Draw a heatmap with the numeric values in each cell
         f, ax = plt.subplots(figsize=(9, 6))
-        sns.heatmap(data = df1, annot = True, linewidths=.5, ax=ax, cmap = sns.color_palette("YlOrBr", as_cmap=True))
+        sns.heatmap(data = df1, annot = True, fmt="1.0f", linewidths=.5, ax=ax, cmap = sns.color_palette("BuGn", as_cmap=True))
         ax.set(xlabel="locs", ylabel="scales")
-        plt.savefig("spiky_project/experiments/synchrony_heatmap")
+        plt.savefig("spiky_project/experiments/spikes_heatmap")
+
+
     
     
 

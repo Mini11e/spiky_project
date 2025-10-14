@@ -43,19 +43,22 @@ if __name__ == "__main__":
     })
 
     fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales))
-    fig.set_figwidth(50)
-    fig.set_figheight(30)
+    fig.set_figwidth(500)
+    fig.set_figheight(300)
   
     
     for s in locs:
         for t in scales:
-
+            nummys = 0
             snn = model.SNN(num_neurons=20, time_steps=timesteps, loc = s, scale = t, plot_xlim = [1800,2000])
             snn.auto_connect(0.15, 13, 3)
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
            
             rsync = snn.rsync_measure(spikes)
+            nummmys = np.sum(spikes)
+            print("NUMM")
+            print(nummmys)
           
             df["x"][counter] = s
             df["y"][counter] = t
@@ -63,12 +66,15 @@ if __name__ == "__main__":
 
             df2["x"][counter] = s
             df2["y"][counter] = t
-            df2["z"][counter] = rsync
+            df2["z"][counter] = nummmys
 
             title = snn.plot(spikes)
 
             img = Image.open(title)
             ax[lenlocs, lenscales].imshow(img)
+
+            
+            
           
             counter += 1
             
@@ -77,8 +83,9 @@ if __name__ == "__main__":
         lenlocs += 1
             
       
-    plt.savefig("spiky_project/experiments/tessst")
-    snn.plot_synchrony(df)
+    plt.savefig("spiky_project/experiments/summary_plots")
+    snn.plot_synchrony(df, df2)
+    #snn.plot_spike_numbers(df2)
     snn.graph()
             
 
