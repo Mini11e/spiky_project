@@ -20,82 +20,76 @@ from matplotlib.path import Path
 
 
 if __name__ == "__main__":
-    # Create a spiking neural network with x neurons
+    
+    # set time steps (ms) for each experimental loop
     timesteps = 2000
 
-    locs = np.linspace(0.8, 1.5, 5)#[0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
-    scales = np.linspace(0.1, 0.5, 5)#[0, 0.1, 0.2, 0.3, 0.4, 0.5]
-    rsyncs = np.zeros(len(locs)*len(scales))
-    counter = 0
-    lenlocs = 0
-    lenscales = 0
-
-    df = pd.DataFrame({
-      'x': rsyncs,
-      'y': rsyncs,
-      'z': rsyncs
-    })
-
-    df2 = pd.DataFrame({
-      'x': rsyncs,
-      'y': rsyncs,
-      'z': rsyncs
-    })
-
-    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales))
-    fig.set_figwidth(500)
-    fig.set_figheight(300)
-  
+    # set arrays for different locs and scales that should be trialled
+    locs = np.round(np.linspace(0.8, 1.5, 5), 2)
+    scales = np.round(np.linspace(0.1, 0.5, 5), 2)
     
-    for s in locs:
-        for t in scales:
-            nummys = 0
-            snn = model.SNN(num_neurons=20, time_steps=timesteps, loc = s, scale = t, plot_xlim = [1800,2000])
+    # helper variables
+    loop = 0
+    num_locs = 0
+    num_scales = 0
+
+    # data frames to save rsyncs and spike counts
+    empty_arr = np.zeros(len(locs)*len(scales))
+    df_rsyncs = pd.DataFrame({
+      'x': empty_arr,
+      'y': empty_arr,
+      'z': empty_arr
+    })
+    df_spikes = pd.DataFrame({
+      'x': empty_arr,
+      'y': empty_arr,
+      'z': empty_arr
+    })
+    
+    # subplots for summary image of experimental loop
+    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))  
+    
+    for loc in locs:
+        for scale in scales:
+  
+            # set up the model and connection strength
+            snn = model.SNN(num_neurons=20, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [1800,2000])
             snn.auto_connect(0.15, 13, 3)
+
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
            
+            # add rsync and spike count of this experimental loop to data frames
             rsync = snn.rsync_measure(spikes)
-            nummmys = np.sum(spikes)
-            print("NUMM")
-            print(nummmys)
+            spikecount = np.sum(spikes)
           
-            df["x"][counter] = s
-            df["y"][counter] = t
-            df["z"][counter] = rsync
+            df_rsyncs["x"][loop] = loc
+            df_rsyncs["y"][loop] = scale
+            df_rsyncs["z"][loop] = rsync
 
-            df2["x"][counter] = s
-            df2["y"][counter] = t
-            df2["z"][counter] = nummmys
+            df_spikes["x"][loop] = loc
+            df_spikes["y"][loop] = scale
+            df_spikes["z"][loop] = spikecount
 
-            title = snn.plot(spikes)
+            # save spike train plot on respective axis for the summary image
+            file = snn.plot(spikes)
+            img = Image.open(file)
+            ax[num_locs, num_scales].imshow(img)
 
-            img = Image.open(title)
-            ax[lenlocs, lenscales].imshow(img)
+            # update helper variables
+            loop += 1
+            num_scales += 1
 
+        # update helper variables 
+        num_scales = 0
+        num_locs += 1
             
-            
-          
-            counter += 1
-            
-            lenscales += 1
-        lenscales = 0
-        lenlocs += 1
-            
-      
+
+    # save spike train plot of each experimental loop in one image
     plt.savefig("spiky_project/experiments/summary_plots")
-    snn.plot_synchrony(df, df2)
-    #snn.plot_spike_numbers(df2)
-    snn.graph()
-            
 
-    
-    
+    # plot heatmaps of rsyncs and spike counts
+    snn.plot_synchrony(df_rsyncs, df_spikes)
 
-    # loc 1-1.5, scale 0-0.5, step 0.1
-
-    
-    # plot network, voltage and spikes
-    
-
+    #snn.graph()
             

@@ -250,21 +250,20 @@ class SNN:
             ax.legend(loc = "upper left", prop={'size': 6})
             ax.set_xlim(self.plot_xlim)
         
-        #fig.suptitle(f'Metrics: tau={self.tau}, thresh={self.threshold}')
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
         title = f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png'
         plt.savefig(title)
         plt.close()
 
-        #return fig, title
         return title
 
     def graph(self):
 
+        # Initialise graph and list for nodes
         g = nx.DiGraph()
-        
         connected_nodes = []   
         
+        # Connect nodes according to connectivity matrix
         for i in range(self.neurons):
             for j in range(self.neurons):
                 if self.connectivity_matrix[i][j] != 0:
@@ -276,15 +275,16 @@ class SNN:
            if k not in connected_nodes:
               g.add_node(k)
 
+        # Set colours to match the neurons in other plots
         colours = {}
         for m in range(self.neurons):
             colours[m] = self.neuron_colours[m]
 
-        # pos = nx.spring_layout(g, k = 4, seed=seed)
+        # Circular layout
         pos = nx.circular_layout(g)
-            
-        nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
-                
+        
+        # Draw graph and save as file
+        nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)      
         plt.savefig("spiky_project/experiments/graph")
 
 
@@ -292,35 +292,20 @@ class SNN:
         
         sns.set_theme()
     
-        df1 = (
-        df1.pivot(index="y", columns="x", values="z")
-        )
+        # Preprocess data frames
+        df1 = (df1.pivot(index="y", columns="x", values="z"))
+        df2 = (df2.pivot(index="y", columns="x", values="z"))
 
-        df2 = (
-            df2.pivot(index="y", columns="x", values="z")
-        )
-
-        # Draw a heatmap with the numeric values in each cell
-        f, ax = plt.subplots(nrows = 1, ncols = 2, figsize=(50, 30))
-        heatmap1 = sns.heatmap(data = df1, annot = True, linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
+        # Two heatmaps with the numeric values with heatmap1 for rsync values and heatmap2 for spike counts
+        fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 4))
+        
+        heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
         heatmap1.set(xlabel="locs", ylabel="scales")
         heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
         heatmap2.set(xlabel="locs", ylabel="scales")
-        plt.savefig("spiky_project/experiments/synchrony_heatmap")
+        fig.tight_layout()
 
-    
-    def plot_spike_numbers(self, df):
-        sns.set_theme()
-    
-        df1 = (
-            df.pivot(index="y", columns="x", values="z")
-        )
-
-        # Draw a heatmap with the numeric values in each cell
-        f, ax = plt.subplots(figsize=(9, 6))
-        sns.heatmap(data = df1, annot = True, fmt="1.0f", linewidths=.5, ax=ax, cmap = sns.color_palette("BuGn", as_cmap=True))
-        ax.set(xlabel="locs", ylabel="scales")
-        plt.savefig("spiky_project/experiments/spikes_heatmap")
+        plt.savefig("spiky_project/experiments/synchrony_spikes_heatmaps")
 
 
     
