@@ -45,7 +45,7 @@ if __name__ == "__main__":
       'y': empty_arr,
       'z': empty_arr
     })
-    
+     
     # subplots for summary image of experimental loop
     fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))  
     

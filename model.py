@@ -303,6 +303,8 @@ class SNN:
         heatmap1.set(xlabel="locs", ylabel="scales")
         heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
         heatmap2.set(xlabel="locs", ylabel="scales")
+        heatmap1.invert_yaxis()
+        heatmap2.invert_yaxis()
         fig.tight_layout()
 
         plt.savefig("spiky_project/experiments/synchrony_spikes_heatmaps")
