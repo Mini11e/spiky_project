@@ -15,7 +15,7 @@ class SNN:
     def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
                  num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000, loc = 0.85, scale = 0.2, plot_xlim = [1800, 2000]):
         '''
-        1) SNN that conductions spikes in an interconnected network of LIF neurons
+        SNN that conductions spikes in an interconnected network of LIF neurons
 
         parameters:
             delta_time: time step for the simulation
@@ -62,7 +62,7 @@ class SNN:
 
     def connect(self, from_neuron, to_neuron, weight):
         '''
-        1) Basis connectivity matrix is all zeros. This function sets individual matrix elements to chosen values.
+        Basis connectivity matrix is all zeros. This function sets individual matrix elements to chosen values.
         The matrix elements represent weights that connects neurons laterally, zeros representing n connection,
         non-zero values represent a connection. The matrix goes from each neuron(row) to each neuron(column).
         
@@ -76,7 +76,15 @@ class SNN:
 
     
     def auto_connect(self, percentage, weight, max_inputs = 1000):
-
+        '''
+        This function fills the connectivity matrix randomly and automatically, according to input percentage.
+        The function also can also restrict amount of input connections per neuron
+        
+        parameters:
+            percentage: connectivity percentage
+            weight: weight of the connections
+            max_inputs: maximum input connections per neuron
+        '''
         #seed: 30
         #seed: 105
         
@@ -102,7 +110,7 @@ class SNN:
 
     def set_inputs(self, neuron, timestep, input_current):
         '''
-        1) Basis input matrix is all zeros. This function sets individual matrix elements to chosen values. 
+        Basis input matrix is all zeros. This function sets individual matrix elements to chosen values. 
         The matrix elements represent input currents that each neuron(row) gets per timestep(column).
 
         parameters:
@@ -117,7 +125,7 @@ class SNN:
 
     def lif_integration(self, V, input_currents, t):
         '''
-        1) uses the LIF formula to calculate how spikes are integrated
+        Uses the LIF formula to calculate how spikes are integrated.
 
         parameters:
             V: array of membrane potentials of all neurons
@@ -197,6 +205,14 @@ class SNN:
     
 
     def rsync_measure(self, firings):
+        '''
+
+        Implements the RSYNC formula.
+
+        parameters:
+            firings: matrix of spike trains per experimental loop
+
+        '''
 
         def exp_convolve(spike_train):
             tau = 3.0  # ms
@@ -213,7 +229,12 @@ class SNN:
         
     
     def plot(self, spikes):
-    
+        '''
+        Plots the spikes (and voltages) of each neuron and saves it as an image in a folder.
+        
+        parameters:
+            spikes: matrix of spike trains
+        '''
         #fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
         fig, ax = plt.subplots(nrows = 1, ncols = 1, sharex = True)
 
@@ -249,6 +270,7 @@ class SNN:
             ax.legend(loc = "upper left", prop={'size': 6})
             ax.set_xlim(self.plot_xlim)
         
+        # Save plot as image
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
         title = f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png'
         plt.savefig(title)
@@ -257,7 +279,10 @@ class SNN:
         return title
 
     def graph(self):
+        '''
+        Draws a circular graph that shows how neurons are connected.
 
+        '''
         # Initialise graph and list for nodes
         g = nx.DiGraph()
         connected_nodes = []   
@@ -288,8 +313,11 @@ class SNN:
         plt.savefig("spiky_project/experiments/graph")
 
 
-    def plot_synchrony(self, df1, df2):
-        
+    def synchrony_spikes_heatmaps(self, df1, df2):
+        '''
+        Plots two heatmaps, one with synchrony measured with RSYNC and one with spike counts.
+
+        '''
         sns.set_theme()
     
         # Preprocess data frames
@@ -307,6 +335,7 @@ class SNN:
         heatmap2.invert_yaxis()
         fig.tight_layout()
 
+        # Save heatmap figure as image
         plt.savefig("spiky_project/experiments/synchrony_spikes_heatmaps")
 
 

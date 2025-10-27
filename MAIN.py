@@ -49,6 +49,8 @@ if __name__ == "__main__":
     # subplots for summary image of experimental loop
     fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))
     plt.tight_layout()
+    ax.set_xlabel('Timesteps')
+    ax.set_ylabel('Neurons')
     
     for loc in locs:
         for scale in scales:
@@ -92,7 +94,7 @@ if __name__ == "__main__":
     #snn.graph()
 
     # plot heatmaps of rsyncs and spike counts
-    snn.plot_synchrony(df_rsyncs, df_spikes)
+    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes)
 
     
             
