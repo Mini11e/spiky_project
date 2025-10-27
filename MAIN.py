@@ -47,7 +47,8 @@ if __name__ == "__main__":
     })
      
     # subplots for summary image of experimental loop
-    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))  
+    fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))
+    plt.tight_layout()
     
     for loc in locs:
         for scale in scales:
@@ -88,8 +89,10 @@ if __name__ == "__main__":
     # save spike train plot of each experimental loop in one image
     plt.savefig("spiky_project/experiments/summary_plots")
 
+    #snn.graph()
+
     # plot heatmaps of rsyncs and spike counts
     snn.plot_synchrony(df_rsyncs, df_spikes)
 
-    #snn.graph()
+    
             

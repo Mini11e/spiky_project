@@ -213,8 +213,7 @@ class SNN:
         
     
     def plot(self, spikes):
-        # heatmap for voltages
-            
+    
         #fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
         fig, ax = plt.subplots(nrows = 1, ncols = 1, sharex = True)
 
@@ -244,9 +243,9 @@ class SNN:
             plot_spikes = plot_spikes[plot_spikes != 0]
             
             ax.eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
-            ax.set_xlabel('Timesteps')
-            ax.set_ylabel('Spikes')
-            ax.set_title(f"Spikes")
+            #ax.set_xlabel('Timesteps')
+            #ax.set_ylabel('Neurons')
+            #ax.set_title(f"Spikes")
             ax.legend(loc = "upper left", prop={'size': 6})
             ax.set_xlim(self.plot_xlim)
         
@@ -284,7 +283,8 @@ class SNN:
         pos = nx.circular_layout(g)
         
         # Draw graph and save as file
-        nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)      
+        nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
+        plt.show()     
         plt.savefig("spiky_project/experiments/graph")
 
 
