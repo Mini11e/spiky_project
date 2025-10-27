@@ -45,12 +45,17 @@ if __name__ == "__main__":
       'y': empty_arr,
       'z': empty_arr
     })
+    df_isi_means = pd.DataFrame({
+      'x': empty_arr,
+      'y': empty_arr,
+      'z': empty_arr
+    })
      
     # subplots for summary image of experimental loop
     fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))
     plt.tight_layout()
-    ax.set_xlabel('Timesteps')
-    ax.set_ylabel('Neurons')
+    #plt.set_xlabel('Timesteps')
+    #plt.set_ylabel('Neurons')
     
     for loc in locs:
         for scale in scales:
@@ -65,6 +70,7 @@ if __name__ == "__main__":
             # add rsync and spike count of this experimental loop to data frames
             rsync = snn.rsync_measure(spikes)
             spikecount = np.sum(spikes)
+            isi_mean = snn.isi_measure(spikes)
           
             df_rsyncs["x"][loop] = loc
             df_rsyncs["y"][loop] = scale
@@ -73,6 +79,10 @@ if __name__ == "__main__":
             df_spikes["x"][loop] = loc
             df_spikes["y"][loop] = scale
             df_spikes["z"][loop] = spikecount
+
+            df_isi_means["x"][loop] = loc
+            df_isi_means["y"][loop] = scale
+            df_isi_means["z"][loop] = isi_mean if isi_mean < 100 else 0
 
             # save spike train plot on respective axis for the summary image
             file = snn.plot(spikes)
@@ -94,7 +104,8 @@ if __name__ == "__main__":
     #snn.graph()
 
     # plot heatmaps of rsyncs and spike counts
-    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes)
+
+    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes, df_isi_means)
 
     
             

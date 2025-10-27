@@ -147,10 +147,6 @@ class SNN:
         V += dV * self.delta_time
 
         self.all_voltages[:,(2*t)-2] = V
-    
-        #refractory
-        #V[refr > 0] = self.resting_potential
-        #refr[refr > 0] -= 1
 
         # if the neuron spiked, reset its voltage to the resting potential
         spiked = V > self.threshold
@@ -225,6 +221,29 @@ class SNN:
         num = np.var(np.mean(firings, axis=0))  # spatial mean across cells, at each time
         den = np.mean(np.var(firings, axis=1))  # variance over time of each cell
         return num / (den + 1e-100)
+    
+
+    def isi_measure(self, spikes):
+
+        isis_all = []
+        for s in spikes:
+                
+            isis_neuron = []
+            counter = 0
+
+            for t in s:
+                    
+                if t == 0:
+                    counter += 1
+
+                if t == 1:
+                    isis_neuron.append(counter)
+                    counter = 0
+                
+            isis_all.append(np.mean(isis_neuron))
+
+        return np.mean(isis_all)
+
     
         
     
@@ -313,7 +332,7 @@ class SNN:
         plt.savefig("spiky_project/experiments/graph")
 
 
-    def synchrony_spikes_heatmaps(self, df1, df2):
+    def synchrony_spikes_heatmaps(self, df1, df2, df3):
         '''
         Plots two heatmaps, one with synchrony measured with RSYNC and one with spike counts.
 
@@ -323,16 +342,20 @@ class SNN:
         # Preprocess data frames
         df1 = (df1.pivot(index="y", columns="x", values="z"))
         df2 = (df2.pivot(index="y", columns="x", values="z"))
+        df3 = (df3.pivot(index="y", columns="x", values="z"))
 
         # Two heatmaps with the numeric values with heatmap1 for rsync values and heatmap2 for spike counts
-        fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize=(10, 4))
+        fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize=(16, 4))
         
         heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
         heatmap1.set(xlabel="locs", ylabel="scales")
         heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
         heatmap2.set(xlabel="locs", ylabel="scales")
+        heatmap3 = sns.heatmap(data = df3, annot = True, fmt=".2f", linewidths=.5, ax=ax[2], cmap = sns.color_palette("Blues_d", as_cmap=True))
+        heatmap3.set(xlabel="locs", ylabel="scales")
         heatmap1.invert_yaxis()
         heatmap2.invert_yaxis()
+        heatmap3.invert_yaxis()
         fig.tight_layout()
 
         # Save heatmap figure as image
