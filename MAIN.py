@@ -16,17 +16,15 @@ from matplotlib.path import Path
 
 # add specifications of variable type in defs
 
-#heatmap spike counts per locs and scales
-
 
 if __name__ == "__main__":
     
     # set time steps (ms) for each experimental loop
-    timesteps = 2000
+    timesteps = 200
 
     # set arrays for different locs and scales that should be trialled
-    locs = np.round(np.linspace(0.8, 1.5, 5), 2)
-    scales = np.round(np.linspace(0.1, 0.5, 5), 2)
+    locs = np.round(np.linspace(0.8, 1.3, 5), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
+    scales = np.round(np.linspace(0.1, 0.5, 5), 2) #np.round(np.linspace(0.1, 0.5, 5), 2)
     
     # helper variables
     loop = 0
@@ -61,15 +59,15 @@ if __name__ == "__main__":
         for scale in scales:
   
             # set up the model and connection strength
-            snn = model.SNN(num_neurons=20, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [1800,2000])
-            snn.auto_connect(0.15, 13, 3)
+            snn = model.SNN(num_neurons=10, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [0,100])
+            snn.auto_connect(0.15, 50, 3)
 
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
            
             # add rsync and spike count of this experimental loop to data frames
             rsync = snn.rsync_measure(spikes)
-            spikecount = np.sum(spikes)
+            spikecount = np.mean(np.sum(spikes, axis=1))
             isi_mean = snn.isi_measure(spikes)
           
             df_rsyncs["x"][loop] = loc
@@ -88,6 +86,7 @@ if __name__ == "__main__":
             file = snn.plot(spikes)
             img = Image.open(file)
             ax[num_locs, num_scales].imshow(img)
+            img.close()
 
             # update helper variables
             loop += 1
@@ -99,9 +98,11 @@ if __name__ == "__main__":
             
 
     # save spike train plot of each experimental loop in one image
-    plt.savefig("spiky_project/experiments/summary_plots")
+    #plt.savefig("spiky_project/EXP_different_locs_scales_1noise/summary_plots")
+    plt.close()
 
-    #snn.graph()
+
+    snn.graph()
 
     # plot heatmaps of rsyncs and spike counts
 

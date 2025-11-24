@@ -247,31 +247,31 @@ class SNN:
     
         
     
-    def plot(self, spikes):
+    def plot(self, spikes, manual_starts = 0):
         '''
         Plots the spikes (and voltages) of each neuron and saves it as an image in a folder.
         
         parameters:
             spikes: matrix of spike trains
         '''
-        #fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
-        fig, ax = plt.subplots(nrows = 1, ncols = 1, sharex = True)
+        fig, ax = plt.subplots(nrows = 1, ncols = 2, sharex = True)
+        #fig, ax = plt.subplots(nrows = 1, ncols = 1, sharex = True)
 
-        #fig.set_size_inches(10, 5)
-        #dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
+        fig.set_size_inches(10, 5)
+        dim1 = np.linspace(0, self.time_steps-1, self.time_steps*2)
 
-        #ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
+        ax[0].hlines(y = self.threshold, xmin = 0, xmax = self.time_steps, colors = "red", linestyles = "dashed", label = "Threshold")
         
         # subplot for each neuron
         for i in range(self.neurons):            
 
-            '''
+            
             ax[0].plot(dim1, self.all_voltages[i], label = f"Neuron {i}", color = self.neuron_colours[i])
             ax[0].set_xlabel('Timesteps')
             ax[0].set_ylabel('Voltage')
             ax[0].set_title(f"Voltages")
             #ax[0].legend(loc = "upper left")
-            '''
+            
 
             j = 0
             plot_spikes = np.zeros(len(spikes[i]))
@@ -280,19 +280,21 @@ class SNN:
                     plot_spikes[j] = k
                     j += 1
 
-            plot_spikes = plot_spikes[plot_spikes != 0]
+            plot_spikes1 = plot_spikes[plot_spikes != 0]
             
-            ax.eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
+            ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
+            #ax[1].scatter(spikes[1], spikes[0])
             #ax.set_xlabel('Timesteps')
             #ax.set_ylabel('Neurons')
             #ax.set_title(f"Spikes")
-            ax.legend(loc = "upper left", prop={'size': 6})
-            ax.set_xlim(self.plot_xlim)
+            ax[1].legend(loc = "upper left", prop={'size': 6})
+            ax[1].set_xlim(self.plot_xlim)
         
         # Save plot as image
-        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
-        title = f'spiky_project/experiments/loc{self.loc:.2f}_scale{self.scale:.2f}.png'
-        plt.savefig(title)
+        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}, Fired manually={manual_starts}')
+        title = f'spiky_project/EXP_manual_induced_spike_windows/loc{self.loc:.2f}_scale{self.scale:.2f}_manually_fired={manual_starts}.png'
+        #plt.savefig(title)
+        plt.show()
         plt.close()
 
         return title
@@ -327,9 +329,11 @@ class SNN:
         pos = nx.circular_layout(g)
         
         # Draw graph and save as file
+        fig = plt.figure()
         nx.draw(g, node_color=[colours[node] for node in g.nodes], pos=pos, with_labels=True)
-        plt.show()     
-        plt.savefig("spiky_project/experiments/graph")
+        #plt.show()     
+        plt.savefig("spiky_project/EXP_different_locs_scales_1noise/graph")
+        plt.close()
 
 
     def synchrony_spikes_heatmaps(self, df1, df2, df3):
@@ -349,17 +353,21 @@ class SNN:
         
         heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
         heatmap1.set(xlabel="locs", ylabel="scales")
+        heatmap1.set_title("Rsync")
         heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
         heatmap2.set(xlabel="locs", ylabel="scales")
+        heatmap2.set_title("Average Spike Count")
         heatmap3 = sns.heatmap(data = df3, annot = True, fmt=".2f", linewidths=.5, ax=ax[2], cmap = sns.color_palette("Blues_d", as_cmap=True))
         heatmap3.set(xlabel="locs", ylabel="scales")
+        heatmap3.set_title("Average ISI")
         heatmap1.invert_yaxis()
         heatmap2.invert_yaxis()
         heatmap3.invert_yaxis()
         fig.tight_layout()
 
         # Save heatmap figure as image
-        plt.savefig("spiky_project/experiments/synchrony_spikes_heatmaps")
+        plt.savefig("spiky_project/EXP_different_locs_scales_1noise/synchrony_spikes_heatmaps")
+
 
 
     
