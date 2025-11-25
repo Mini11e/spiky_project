@@ -13,7 +13,7 @@ import seaborn as sns
 
 class SNN:
     def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
-                 num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000, loc = 0.85, scale = 0.2, plot_xlim = [1800, 2000]):
+                 num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000, loc = 0.85, scale = 0.2, plot_xlim = [0, 2000]):
         '''
         SNN that conductions spikes in an interconnected network of LIF neurons
 
@@ -179,7 +179,8 @@ class SNN:
 
         steps    = np.arange(0, time_steps + self.delta_time, self.delta_time)      # simulation time steps [ms] ## why +self.delta_time? one more i guess
         voltage       = np.zeros((self.neurons, len(steps)))  # array for saving voltage history
-        voltage[:, 0] = self.resting_potential                # set initial voltage to resting potential
+        start_noise = np.random.normal(loc=-65, scale=2, size=(self.neurons))
+        voltage[:, 0] = start_noise #self.resting_potential               # set initial voltage to resting potential
         spikes        = np.zeros((self.neurons, len(steps)))  # initialise spike output
         #refr          = np.zeros((self.neurons,))
     
@@ -239,10 +240,13 @@ class SNN:
                 if t == 1:
                     isis_neuron.append(counter)
                     counter = 0
-                
-            isis_all.append(np.mean(isis_neuron))
+                    
 
-        return np.mean(isis_all)
+            isis_all.append(np.mean(isis_neuron))
+        
+        isis_all_cleaned = [x for x in isis_all if str(x) != 'nan']
+
+        return np.mean(isis_all_cleaned)
 
     
         
@@ -292,10 +296,10 @@ class SNN:
         
         # Save plot as image
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}, Fired manually={manual_starts}')
-        title = f'spiky_project/EXP_manual_induced_spike_windows/loc{self.loc:.2f}_scale{self.scale:.2f}_manually_fired={manual_starts}.png'
-        #plt.savefig(title)
-        plt.show()
-        plt.close()
+        title = f'spiky_project/EXP_different_locs_scales_1noise/loc{self.loc:.2f}_scale{self.scale:.2f}_manually_fired={manual_starts}.png'
+        plt.savefig(title)
+        #plt.show()
+        #plt.close()
 
         return title
 

@@ -23,8 +23,8 @@ if __name__ == "__main__":
     timesteps = 200
 
     # set arrays for different locs and scales that should be trialled
-    locs = np.round(np.linspace(0.8, 1.3, 5), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
-    scales = np.round(np.linspace(0.1, 0.5, 5), 2) #np.round(np.linspace(0.1, 0.5, 5), 2)
+    locs = np.round(np.linspace(0.8, 1, 3), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
+    scales = np.round(np.linspace(0.1, 0.5, 5), 2)
     
     # helper variables
     loop = 0
@@ -59,8 +59,8 @@ if __name__ == "__main__":
         for scale in scales:
   
             # set up the model and connection strength
-            snn = model.SNN(num_neurons=10, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [0,100])
-            snn.auto_connect(0.15, 50, 3)
+            snn = model.SNN(num_neurons=50, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [0,200])
+            snn.auto_connect(0.05, 30, 10)
 
             # let the neuron run for x timesteps
             voltage, spikes = snn.simulate(time_steps=timesteps)
@@ -80,7 +80,8 @@ if __name__ == "__main__":
 
             df_isi_means["x"][loop] = loc
             df_isi_means["y"][loop] = scale
-            df_isi_means["z"][loop] = isi_mean if isi_mean < 100 else 0
+            df_isi_means["z"][loop] = isi_mean
+
 
             # save spike train plot on respective axis for the summary image
             file = snn.plot(spikes)
@@ -91,10 +92,12 @@ if __name__ == "__main__":
             # update helper variables
             loop += 1
             num_scales += 1
+            print(loc, scale)
 
         # update helper variables 
         num_scales = 0
         num_locs += 1
+        
             
 
     # save spike train plot of each experimental loop in one image

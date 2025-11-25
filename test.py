@@ -6,9 +6,8 @@ import MAIN
 
 if __name__ == "__main__":
 
+    x = 1.45354
 
-    spikes = np.array(((1,2),(3,4)))
-    spikecount = np.mean(np.sum(k) for k in spikes)
-    print(spikecount)
+    print(np.round(x, 1))
 
         
