@@ -59,7 +59,7 @@ if __name__ == "__main__":
         for scale in scales:
   
             # set up the model and connection strength
-            snn = model.SNN(num_neurons=50, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [0,200])
+            snn = model.SNN(num_neurons=50, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [100,200])
             snn.auto_connect(0.05, 30, 10)
 
             # let the neuron run for x timesteps
@@ -88,7 +88,8 @@ if __name__ == "__main__":
             img = Image.open(file)
             ax[num_locs, num_scales].imshow(img)
             img.close()
-            snn.plot_patterns(spikes)
+            pattern_length = snn.analyse_plot_patterns(spikes)
+            print(loc, scale, np.mean(pattern_length))
 
             # update helper variables
             loop += 1

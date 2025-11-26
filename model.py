@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random
 import seaborn as sns
+from scipy.interpolate import make_smoothing_spline, BSpline
 
 
 #(self, delta_time = 1.0, tau=20.0, threshold=0.1, reset_voltage=0.0, resting_potential=0.0, neurons=10, input_matrix=None, connectivity_matrix=None)
@@ -291,6 +292,10 @@ class SNN:
             #ax.set_title(f"Spikes")
             ax[1].legend(loc = "upper left", prop={'size': 6})
             ax[1].set_xlim(self.plot_xlim)
+
+            # if scatterplot:
+            # neuron_idx, time_idx = np.where(spike_trains == 1)
+            # plt.scatter(time_idx, neuron_idx, s=5, marker='*')
         
         # Save plot as image
         fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
@@ -301,10 +306,11 @@ class SNN:
 
         return title
 
-    def plot_patterns(self, spikes):
+    def analyse_plot_patterns(self, spikes):
 
         patterns = spikes.sum(axis=0)
         plt.plot(range(self.time_steps+1), patterns)
+
 
         # Save plot as image
         plt.title(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
@@ -312,6 +318,27 @@ class SNN:
         plt.savefig(title)
         #plt.show()
         plt.close()
+
+        max = np.max(patterns)
+        pattern_threshold = max - max*0.8
+
+        print("thresh", pattern_threshold)
+
+        len_patterns = []
+        counter = 0
+
+        for p in patterns:
+
+            if p <= pattern_threshold:
+                len_patterns.append(counter)
+                counter = 0
+
+            if p > pattern_threshold:
+                counter +=1
+        
+        len_patterns = np.asarray(len_patterns)
+        return(len_patterns[len_patterns != 0])
+
 
 
     def graph(self):
