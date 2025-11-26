@@ -84,15 +84,15 @@ if __name__ == "__main__":
 
 
             # save spike train plot on respective axis for the summary image
-            file = snn.plot(spikes)
+            file = snn.plot_voltage_spikes(spikes)
             img = Image.open(file)
             ax[num_locs, num_scales].imshow(img)
             img.close()
+            snn.plot_patterns(spikes)
 
             # update helper variables
             loop += 1
             num_scales += 1
-            print(loc, scale)
 
         # update helper variables 
         num_scales = 0

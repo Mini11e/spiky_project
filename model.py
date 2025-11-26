@@ -251,7 +251,7 @@ class SNN:
     
         
     
-    def plot(self, spikes, manual_starts = 0):
+    def plot_voltage_spikes(self, spikes, manual_starts = 0):
         '''
         Plots the spikes (and voltages) of each neuron and saves it as an image in a folder.
         
@@ -283,8 +283,6 @@ class SNN:
                 if spikes[i,k] == 1:
                     plot_spikes[j] = k
                     j += 1
-
-            plot_spikes1 = plot_spikes[plot_spikes != 0]
             
             ax[1].eventplot(plot_spikes, label = f"Neuron {i}", lineoffsets = i, linelengths= 0.5, color = self.neuron_colours[i])
             #ax[1].scatter(spikes[1], spikes[0])
@@ -295,13 +293,26 @@ class SNN:
             ax[1].set_xlim(self.plot_xlim)
         
         # Save plot as image
-        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}, Fired manually={manual_starts}')
-        title = f'spiky_project/EXP_different_locs_scales_1noise/loc{self.loc:.2f}_scale{self.scale:.2f}_manually_fired={manual_starts}.png'
+        fig.suptitle(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
+        title = f'spiky_project/EXP_different_locs_scales_1noise/SPIKES_loc{self.loc:.2f}_scale{self.scale:.2f}.png'
         plt.savefig(title)
         #plt.show()
-        #plt.close()
+        plt.close()
 
         return title
+
+    def plot_patterns(self, spikes):
+
+        patterns = spikes.sum(axis=0)
+        plt.plot(range(self.time_steps+1), patterns)
+
+        # Save plot as image
+        plt.title(f'Gaussian Noise Parameters: Loc={self.loc:.2f}, Scale={self.scale:.2f}')
+        title = f'spiky_project/EXP_different_locs_scales_1noise/PATTERNS_loc{self.loc:.2f}_scale{self.scale:.2f}.png'
+        plt.savefig(title)
+        #plt.show()
+        plt.close()
+
 
     def graph(self):
         '''
