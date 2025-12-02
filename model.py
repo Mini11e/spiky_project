@@ -13,7 +13,7 @@ from scipy.interpolate import make_smoothing_spline, BSpline
 
 
 class SNN:
-    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0,
+    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0, t_refr = 3,
                  num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000, loc = 0.85, scale = 0.2, plot_xlim = [0, 2000]):
         '''
         SNN that conductions spikes in an interconnected network of LIF neurons
@@ -35,6 +35,7 @@ class SNN:
         self.neurons = num_neurons
         self.all_voltages = np.zeros((num_neurons, 2*(time_steps)))
         self.time_steps = time_steps
+        self.t_refr = t_refr
 
         self.max_spikes_record = max_spikes_record
         self.spikes_num = 0        
@@ -47,7 +48,7 @@ class SNN:
         self.plot_xlim = plot_xlim
 
         # good noise parameters: loc=0.85, scale = 0.2 # .clip(0, None) to remove anything below 0
-        self.noise = np.random.normal(loc=self.loc, scale=self.scale, size=(self.neurons, time_steps))
+        self.noise = np.random.normal(loc=self.loc, scale=self.scale, size=(self.neurons, time_steps)).clip(0, None)
         
 
         # self.t_refr = t_refr
@@ -124,7 +125,7 @@ class SNN:
 
 
 
-    def lif_integration(self, V, input_currents, t):
+    def lif_integration(self, V, input_currents, t, refr):
         '''
         Uses the LIF formula to calculate how spikes are integrated.
 
@@ -150,16 +151,22 @@ class SNN:
         self.all_voltages[:,(2*t)-2] = V
 
         # if the neuron spiked, reset its voltage to the resting potential
+        
+        #self.spikes_num += sum(spiked)
+        #print(self.spikes_num)
+
+        #V[refr>0] = self.resting_potential
+        #refr[refr>0] -= 1
+
         spiked = V > self.threshold
         V[spiked]    = self.resting_potential
         self.all_voltages[:,(2*t)-1] = V
 
-        #self.spikes_num += sum(spiked)
-        #print(self.spikes_num)
-
         #refr[spiked] = self.t_refr / self.delta_time
 
-        return V, spiked
+        refr = 0
+
+        return V, spiked, refr
     
 
     
@@ -183,7 +190,7 @@ class SNN:
         start_noise = np.random.normal(loc=-65, scale=2, size=(self.neurons))
         voltage[:, 0] = start_noise #self.resting_potential               # set initial voltage to resting potential
         spikes        = np.zeros((self.neurons, len(steps)))  # initialise spike output
-        #refr          = np.zeros((self.neurons,))
+        refr          = np.zeros((self.neurons,))
     
         # simulation
         for t in range(1, len(steps)):
@@ -195,7 +202,7 @@ class SNN:
                 total_input = external_input + lateral_input #arr+arr=arr
 
                 # record voltage and spikes
-                voltage[:, t], spikes[:, t] = self.lif_integration(voltage[:, t-1], total_input, t)
+                voltage[:, t], spikes[:, t], refr = self.lif_integration(voltage[:, t-1], total_input, t, refr)
 
             # add visualise() per timestep?
             
@@ -320,7 +327,7 @@ class SNN:
         plt.close()
 
         max = np.max(patterns)
-        pattern_threshold = max - max*0.8
+        pattern_threshold = max*0.2
 
         print("thresh", pattern_threshold)
 

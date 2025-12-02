@@ -10,21 +10,21 @@ from matplotlib.path import Path
 
 
 ######TO DO######
-# add refractory period?
-# add different amounts of input?
-# simulate different patterns
-
-# add specifications of variable type in defs
+# keep refractory?
+# make another heatmap showing average pattern size
+# new measure for patterns ?
+# try diffent noise params to underline hypothesis
+# ask Gordon: different noise distribution? otherwise is truncated Gaussian
 
 
 if __name__ == "__main__":
     
     # set time steps (ms) for each experimental loop
-    timesteps = 200
+    timesteps = 800
 
     # set arrays for different locs and scales that should be trialled
-    locs = np.round(np.linspace(0.8, 1, 3), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
-    scales = np.round(np.linspace(0.1, 0.5, 5), 2)
+    locs = np.round(np.linspace(0.4, 1, 7), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
+    scales = np.round(np.linspace(0.1, 0.8, 8), 2)
     
     # helper variables
     loop = 0
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         for scale in scales:
   
             # set up the model and connection strength
-            snn = model.SNN(num_neurons=50, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [100,200])
+            snn = model.SNN(num_neurons=50, time_steps=timesteps, loc = loc, scale = scale, plot_xlim = [300,800])
             snn.auto_connect(0.05, 30, 10)
 
             # let the neuron run for x timesteps
