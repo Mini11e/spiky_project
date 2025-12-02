@@ -14,6 +14,7 @@ from matplotlib.path import Path
 # make another heatmap showing average pattern size
 # new measure for patterns ?
 # try diffent noise params to underline hypothesis
+# 
 # ask Gordon: different noise distribution? otherwise is truncated Gaussian
 
 
