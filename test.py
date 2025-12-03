@@ -15,7 +15,18 @@ if __name__ == "__main__":
                                    (1,0,0),
                                    (0,1,0)))
     
+    #first neuron spiked at prev timestep
+    spikes = np.array((1,0,0)) # multiply by connectivity matrix, 
+    # but make it a connectivity matrix where each is connected with 1,
+    # so separate from usual matrix
+
+    prev_spikes = np.dot(connectivity_matrix, spikes)
+    print(prev_spikes)
+    
 
     connectivity_matrix[0][1]= 2
     print(connectivity_matrix)
+
+    # array of lists, 1 list for each neuron, add element each time if pattern gone through
+    # sum over 
         
