@@ -10,11 +10,10 @@ from matplotlib.path import Path
 
 
 ######TO DO######
-# keep refractory?
 # make another heatmap showing average pattern size
 # new measure for patterns ?
 # try diffent noise params to underline hypothesis
-# 
+# save experiments in folder: with refr/no refr, with noise clipping/no noise clipping
 # ask Gordon: different noise distribution? otherwise is truncated Gaussian
 
 
@@ -49,6 +48,12 @@ if __name__ == "__main__":
       'y': empty_arr,
       'z': empty_arr
     })
+
+    df_pattern_len = pd.DataFrame({
+      'x': empty_arr,
+      'y': empty_arr,
+      'z': empty_arr
+    })
      
     # subplots for summary image of experimental loop
     fig, ax = plt.subplots(nrows = len(locs), ncols = len(scales), figsize = (500, 300))
@@ -70,7 +75,8 @@ if __name__ == "__main__":
             rsync = snn.rsync_measure(spikes)
             spikecount = np.mean(np.sum(spikes, axis=1))
             isi_mean = snn.isi_measure(spikes)
-          
+            pattern_length = np.mean(snn.analyse_plot_patterns(spikes))
+
             df_rsyncs["x"][loop] = loc
             df_rsyncs["y"][loop] = scale
             df_rsyncs["z"][loop] = rsync
@@ -83,14 +89,15 @@ if __name__ == "__main__":
             df_isi_means["y"][loop] = scale
             df_isi_means["z"][loop] = isi_mean
 
+            df_pattern_len["x"][loop] = loc
+            df_pattern_len["y"][loop] = scale
+            df_pattern_len["z"][loop] = pattern_length
 
             # save spike train plot on respective axis for the summary image
             file = snn.plot_voltage_spikes(spikes)
             img = Image.open(file)
             ax[num_locs, num_scales].imshow(img)
             img.close()
-            pattern_length = snn.analyse_plot_patterns(spikes)
-            print(loc, scale, np.mean(pattern_length))
 
             # update helper variables
             loop += 1
@@ -110,8 +117,7 @@ if __name__ == "__main__":
     snn.graph()
 
     # plot heatmaps of rsyncs and spike counts
-
-    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes, df_isi_means)
+    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes, df_isi_means, df_pattern_len)
 
     
             

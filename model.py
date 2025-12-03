@@ -66,7 +66,7 @@ class SNN:
         '''
         Basis connectivity matrix is all zeros. This function sets individual matrix elements to chosen values.
         The matrix elements represent weights that connects neurons laterally, zeros representing n connection,
-        non-zero values represent a connection. The matrix goes from each neuron(row) to each neuron(column).
+        non-zero values represent a connection. The matrix goes from each neuron(column) to each neuron(row).
         
         parameters:
             from_neuron: input neuron
@@ -164,7 +164,7 @@ class SNN:
 
         #refr[spiked] = self.t_refr / self.delta_time
 
-        refr = 0
+        refr = 0 #comment out if refr needed
 
         return V, spiked, refr
     
@@ -203,8 +203,6 @@ class SNN:
 
                 # record voltage and spikes
                 voltage[:, t], spikes[:, t], refr = self.lif_integration(voltage[:, t-1], total_input, t, refr)
-
-            # add visualise() per timestep?
             
         return voltage, spikes
     
@@ -259,7 +257,7 @@ class SNN:
     
         
     
-    def plot_voltage_spikes(self, spikes, manual_starts = 0):
+    def plot_voltage_spikes(self, spikes):
         '''
         Plots the spikes (and voltages) of each neuron and saves it as an image in a folder.
         
@@ -385,7 +383,7 @@ class SNN:
         plt.close()
 
 
-    def synchrony_spikes_heatmaps(self, df1, df2, df3):
+    def synchrony_spikes_heatmaps(self, df1, df2, df3, df4):
         '''
         Plots two heatmaps, one with synchrony measured with RSYNC and one with spike counts.
 
@@ -396,22 +394,27 @@ class SNN:
         df1 = (df1.pivot(index="y", columns="x", values="z"))
         df2 = (df2.pivot(index="y", columns="x", values="z"))
         df3 = (df3.pivot(index="y", columns="x", values="z"))
+        df4 = (df4.pivot(index="y", columns="x", values="z"))
 
         # Two heatmaps with the numeric values with heatmap1 for rsync values and heatmap2 for spike counts
-        fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize=(16, 4))
+        fig, ax = plt.subplots(nrows = 2, ncols = 2, figsize=(12, 10))
         
-        heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
+        heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0][0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
         heatmap1.set(xlabel="locs", ylabel="scales")
         heatmap1.set_title("Rsync")
-        heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[1], cmap = sns.color_palette("BuGn", as_cmap=True))
+        heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[0][1], cmap = sns.color_palette("BuGn", as_cmap=True))
         heatmap2.set(xlabel="locs", ylabel="scales")
         heatmap2.set_title("Average Spike Count")
-        heatmap3 = sns.heatmap(data = df3, annot = True, fmt=".2f", linewidths=.5, ax=ax[2], cmap = sns.color_palette("Blues_d", as_cmap=True))
+        heatmap3 = sns.heatmap(data = df3, annot = True, fmt=".2f", linewidths=.5, ax=ax[1][0], cmap = sns.color_palette("Blues_d", as_cmap=True))
         heatmap3.set(xlabel="locs", ylabel="scales")
         heatmap3.set_title("Average ISI")
+        heatmap4 = sns.heatmap(data = df4, annot = True, fmt=".2f", linewidths=.5, ax=ax[1][1], cmap = sns.color_palette("rocket", as_cmap=True))
+        heatmap4.set(xlabel="locs", ylabel="scales")
+        heatmap1.set_title("Average Pattern Length")
         heatmap1.invert_yaxis()
         heatmap2.invert_yaxis()
         heatmap3.invert_yaxis()
+        heatmap4.invert_yaxis()
         fig.tight_layout()
 
         # Save heatmap figure as image
