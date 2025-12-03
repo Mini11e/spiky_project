@@ -20,7 +20,8 @@ if __name__ == "__main__":
     # but make it a connectivity matrix where each is connected with 1,
     # so separate from usual matrix
 
-    prev_spikes = np.dot(connectivity_matrix, spikes)
+    prev_spikes = np.dot(connectivity_matrix, spikes) # shows which neuron got input from lateral connection
+    # now make a if clause that add all that are 1 to a neuron list placeholder and counts until it encounters a zero, then add to list of neurons
     print(prev_spikes)
     
 
