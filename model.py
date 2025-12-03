@@ -13,7 +13,7 @@ from scipy.interpolate import make_smoothing_spline, BSpline
 
 
 class SNN:
-    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0, t_refr = 3,
+    def __init__(self, delta_time=1.0, resting_potential=-65, threshold=-55, tau=10.0, t_refr = 0,
                  num_neurons=10, time_steps = 10, num_inputs = 10, input_matrix=None, connectivity_matrix=None, max_spikes_record=100000, loc = 0.85, scale = 0.2, plot_xlim = [0, 2000]):
         '''
         SNN that conductions spikes in an interconnected network of LIF neurons
@@ -48,7 +48,8 @@ class SNN:
         self.plot_xlim = plot_xlim
 
         # good noise parameters: loc=0.85, scale = 0.2 # .clip(0, None) to remove anything below 0
-        self.noise = np.random.normal(loc=self.loc, scale=self.scale, size=(self.neurons, time_steps)).clip(0, None)
+        self.noise = np.random.normal(loc=self.loc, scale=self.scale, size=(self.neurons, time_steps))#.clip(0, None)
+        #self.noise = np.random.gamma(shape=self.loc, scale=self.scale, size=(self.neurons, time_steps))
         
 
         # self.t_refr = t_refr
@@ -155,16 +156,16 @@ class SNN:
         #self.spikes_num += sum(spiked)
         #print(self.spikes_num)
 
-        #V[refr>0] = self.resting_potential
-        #refr[refr>0] -= 1
+        V[refr>0] = self.resting_potential
+        refr[refr>0] -= 1
 
         spiked = V > self.threshold
         V[spiked]    = self.resting_potential
         self.all_voltages[:,(2*t)-1] = V
 
-        #refr[spiked] = self.t_refr / self.delta_time
+        refr[spiked] = self.t_refr / self.delta_time
 
-        refr = 0 #comment out if refr needed
+        #refr = 0 #comment out if refr needed
 
         return V, spiked, refr
     
@@ -325,10 +326,7 @@ class SNN:
         plt.close()
 
         max = np.max(patterns)
-        pattern_threshold = max*0.2
-
-        print("thresh", pattern_threshold)
-
+        pattern_threshold = max*0.2 # = 0
         len_patterns = []
         counter = 0
 
@@ -342,7 +340,8 @@ class SNN:
                 counter +=1
         
         len_patterns = np.asarray(len_patterns)
-        return(len_patterns[len_patterns != 0])
+        len_patterns = len_patterns[len_patterns != 0]
+        return(len_patterns)
 
 
 
@@ -383,7 +382,7 @@ class SNN:
         plt.close()
 
 
-    def synchrony_spikes_heatmaps(self, df1, df2, df3, df4):
+    def synchrony_spikes_heatmaps(self, df1, df2, df3, df4, interconnection, noise, refr, patternmethod):
         '''
         Plots two heatmaps, one with synchrony measured with RSYNC and one with spike counts.
 
@@ -398,19 +397,20 @@ class SNN:
 
         # Two heatmaps with the numeric values with heatmap1 for rsync values and heatmap2 for spike counts
         fig, ax = plt.subplots(nrows = 2, ncols = 2, figsize=(12, 10))
+        fig.suptitle(f'Interconnection={interconnection} Noise={noise} Refr={refr} Patternmethod={patternmethod}')
         
         heatmap1 = sns.heatmap(data = df1, annot = True, fmt=".2f", linewidths=.5, ax=ax[0][0], cmap = sns.color_palette("YlOrBr", as_cmap=True))
-        heatmap1.set(xlabel="locs", ylabel="scales")
+        heatmap1.set(xlabel="mean", ylabel="variance")
         heatmap1.set_title("Rsync")
         heatmap2 = sns.heatmap(data = df2, annot = True, fmt="1.0f", linewidths=.5, ax=ax[0][1], cmap = sns.color_palette("BuGn", as_cmap=True))
-        heatmap2.set(xlabel="locs", ylabel="scales")
+        heatmap2.set(xlabel="mean", ylabel="variance")
         heatmap2.set_title("Average Spike Count")
         heatmap3 = sns.heatmap(data = df3, annot = True, fmt=".2f", linewidths=.5, ax=ax[1][0], cmap = sns.color_palette("Blues_d", as_cmap=True))
-        heatmap3.set(xlabel="locs", ylabel="scales")
+        heatmap3.set(xlabel="mean", ylabel="variance")
         heatmap3.set_title("Average ISI")
-        heatmap4 = sns.heatmap(data = df4, annot = True, fmt=".2f", linewidths=.5, ax=ax[1][1], cmap = sns.color_palette("rocket", as_cmap=True))
-        heatmap4.set(xlabel="locs", ylabel="scales")
-        heatmap1.set_title("Average Pattern Length")
+        heatmap4 = sns.heatmap(data = df4, annot = True, fmt=".2f", linewidths=.5, ax=ax[1][1], cmap = sns.color_palette("Purples", as_cmap=True))
+        heatmap4.set(xlabel="mean", ylabel="variance")
+        heatmap4.set_title("Average Pattern Length")
         heatmap1.invert_yaxis()
         heatmap2.invert_yaxis()
         heatmap3.invert_yaxis()
@@ -418,7 +418,7 @@ class SNN:
         fig.tight_layout()
 
         # Save heatmap figure as image
-        plt.savefig("spiky_project/EXP_different_locs_scales_1noise/synchrony_spikes_heatmaps")
+        plt.savefig(f'spiky_project/EXP_different_locs_scales_1noise/HEATMAP_interconnection{interconnection}_noise{noise}_refr{refr}_patternmethod{patternmethod}.png')
 
 
 

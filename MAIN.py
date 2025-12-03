@@ -10,11 +10,8 @@ from matplotlib.path import Path
 
 
 ######TO DO######
-# make another heatmap showing average pattern size
-# new measure for patterns ?
 # try diffent noise params to underline hypothesis
-# save experiments in folder: with refr/no refr, with noise clipping/no noise clipping
-# ask Gordon: different noise distribution? otherwise is truncated Gaussian
+
 
 
 if __name__ == "__main__":
@@ -23,8 +20,8 @@ if __name__ == "__main__":
     timesteps = 800
 
     # set arrays for different locs and scales that should be trialled
-    locs = np.round(np.linspace(0.4, 1, 7), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
-    scales = np.round(np.linspace(0.1, 0.8, 8), 2)
+    locs = np.round(np.linspace(0.2,1, 9), 2) #np.round(np.linspace(0.8, 1.5, 5), 2)
+    scales = np.round(np.linspace(0.4, 1.2, 9), 2)
     
     # helper variables
     loop = 0
@@ -61,6 +58,7 @@ if __name__ == "__main__":
     #plt.set_xlabel('Timesteps')
     #plt.set_ylabel('Neurons')
     
+    
     for loc in locs:
         for scale in scales:
   
@@ -76,6 +74,7 @@ if __name__ == "__main__":
             spikecount = np.mean(np.sum(spikes, axis=1))
             isi_mean = snn.isi_measure(spikes)
             pattern_length = np.mean(snn.analyse_plot_patterns(spikes))
+            print(snn.analyse_plot_patterns(spikes))
 
             df_rsyncs["x"][loop] = loc
             df_rsyncs["y"][loop] = scale
@@ -117,7 +116,29 @@ if __name__ == "__main__":
     snn.graph()
 
     # plot heatmaps of rsyncs and spike counts
-    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes, df_isi_means, df_pattern_len)
+    snn.synchrony_spikes_heatmaps(df_rsyncs, df_spikes, df_isi_means, df_pattern_len, 
+                                  interconnection = "30",
+                                  noise = "gauss", 
+                                  refr = "0", 
+                                  patternmethod = "0.2")
+    
+    ## save heatmaps: refr(0,3,10), interconnection_strength(30,50,80)
+    ## noise distribution(gamma, gauss,gauss+clip), pattern_length_thresh(0.2 percent, 0)
+    ## done:
+    # (i30_gaussclipped_r0_20perc) 
+    # (i30_gauss_r0_20perc)
+    # (i30_gamma_r0_20perc) 
+    # (i30_gaussclipped_r3_20perc)
+    # (i30_gauss_r3_20perc)
+    # (i30_gamma_r3_20perc)
+    # (i30_gaussclipped_r10_20perc)
+    # (i30_gauss_r10_20perc)
+    # (i30_gamma_r10_20perc)
+
+
+    ## not done:
+    # i50/i70 too strong, all one pattern
+    # 0 as pattern thresh, only if interesting later
 
     
             
